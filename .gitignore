@@ -1,0 +1,9 @@
+#virtual env
+feedback-brain/
+
+#data
+data/
+
+#pychahe
+*.pyc
+__pycache__/
