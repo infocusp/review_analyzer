@@ -2,7 +2,7 @@
 review_analsis_venv/
 
 #data
-data/
+# data/
 
 #pychahe
 *.pyc
