@@ -1,8 +1,14 @@
-from langchain.prompts import PromptTemplate, ChatPromptTemplate
-from few_shot_examples import spotify_examples
 from typing import List, Tuple, Union
 
-def format_assistant_examples(example_reviews:List[List[Tuple[str, Union[PromptTemplate, str]]]])->List[Tuple[str, str]]:
+from langchain.prompts import ChatPromptTemplate
+from langchain.prompts import PromptTemplate
+
+from few_shot_examples import spotify_examples
+
+
+def format_assistant_examples(
+    example_reviews: List[List[Tuple[str, Union[PromptTemplate, str]]]]
+) -> List[Tuple[str, str]]:
     """
     Arranges all assistant examples in a chat format.
     
@@ -25,11 +31,14 @@ def format_assistant_examples(example_reviews:List[List[Tuple[str, Union[PromptT
         # Append user and assistant messages one by one
         assistant_examples.append((user_role, user_content))
         assistant_examples.append((assistant_role, assistant_content))
-    
+
     return assistant_examples
 
-def get_user_prompt(formatted_reviews:str, task_description:str="Extract entities and sentiment from these reviews:")->str:
 
+def get_user_prompt(
+    formatted_reviews: str,
+    task_description: str = "Extract entities and sentiment from these reviews:"
+) -> str:
     """
     Generates a structured user prompt using PromptTemplate.
 
@@ -45,12 +54,13 @@ def get_user_prompt(formatted_reviews:str, task_description:str="Extract entitie
         template="""
         {task_description}
         {formatted_reviews}
-        """
-    )
-    
-    return user_prompt_template.format(task_description=task_description, formatted_reviews=formatted_reviews)
+        """)
 
-def get_system_propmt(existing_entities:List[str]=[]):
+    return user_prompt_template.format(task_description=task_description,
+                                       formatted_reviews=formatted_reviews)
+
+
+def get_system_propmt(existing_entities: List[str] = []):
     """
     Generates a structured system prompt using PromptTemplate.
 
@@ -61,10 +71,9 @@ def get_system_propmt(existing_entities:List[str]=[]):
     Returns:
       user prompt (str): A formatted system prompt.
     """
-    
-    system_prompt = PromptTemplate(
-        input_variables = ["existing_entities"],
-        template = """
+
+    system_prompt = PromptTemplate(input_variables=["existing_entities"],
+                                   template="""
             You are an AI assistant specializing in **extracting structured insights from Spotify user reviews**.
             Your goal is to **identify key entities, classify sentiment, and avoid redundant entity creation**.
 
@@ -82,13 +91,14 @@ def get_system_propmt(existing_entities:List[str]=[]):
             ### **Response Format**
             Return structured **JSON only**, without explanations or markdown.
             If only "positive_reviews" are found for a particular entity, give empty list for "negative_reviews", vice versa.
-        """
-    )
+        """)
 
     return system_prompt.format(existing_entities=existing_entities)
 
+
 chat_prompt_template = ChatPromptTemplate.from_messages([
-    ("system", "{system_prompt}"),   # System message
-    *format_assistant_examples(spotify_examples),  # Example input/output from assistant
+    ("system", "{system_prompt}"),  # System message
+    *format_assistant_examples(
+        spotify_examples),  # Example input/output from assistant
     ("user", "{user_prompt}")  # User's actual input
 ])

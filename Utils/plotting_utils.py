@@ -1,12 +1,15 @@
+from typing import List
+
+import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 import seaborn as sns
-import matplotlib.pyplot as plt
-from typing import List
 
 
 #  Entity Frequency (Top Entities)
-def plot_entity_frequency(report:dict, top_k:int=10, save_path:str="./entity_frequency.png")->None:
+def plot_entity_frequency(report: dict,
+                          top_k: int = 10,
+                          save_path: str = "./entity_frequency.png") -> None:
     """
     Generates and saves a bar plot of the most frequently mentioned entities in the review analysis report.
 
@@ -19,18 +22,29 @@ def plot_entity_frequency(report:dict, top_k:int=10, save_path:str="./entity_fre
     Returns:
         None
     """
-    entity_counts = {entity: details["positive_reviews"]["count"] + details["negative_reviews"]["count"] for entity, details in report.items()}
-    sorted_entities = sorted(entity_counts.items(), key=lambda x: x[1], reverse=True)[:top_k]  # Top 20 entities
+    entity_counts = {
+        entity: details["positive_reviews"]["count"] +
+        details["negative_reviews"]["count"]
+        for entity, details in report.items()
+    }
+    sorted_entities = sorted(entity_counts.items(),
+                             key=lambda x: x[1],
+                             reverse=True)[:top_k]  # Top 20 entities
 
     x = [e[1] for e in sorted_entities]
     y = [e[0] for e in sorted_entities]
-    
+
     plt.figure(figsize=(15, 8))
     ax = sns.barplot(x=x, y=y, palette="viridis")
 
     # Annotate bars with values
     for index, value in enumerate(x):
-        ax.text(value + 50, index, str(value), va='center', fontsize=12, color='black')
+        ax.text(value + 50,
+                index,
+                str(value),
+                va='center',
+                fontsize=12,
+                color='black')
 
     plt.xlabel("Total Mentions")
     plt.ylabel("Entity")
@@ -40,7 +54,10 @@ def plot_entity_frequency(report:dict, top_k:int=10, save_path:str="./entity_fre
 
 
 # Review length vs Entities extracted
-def plot_review_length_vs_entities_violin(reviews:List[str], report:dict, save_path:str="./review_length_vs_entities_violin.png")->None:
+def plot_review_length_vs_entities_violin(
+        reviews: List[str],
+        report: dict,
+        save_path: str = "./review_length_vs_entities_violin.png") -> None:
     """
     Generates and saves a violin plot showcasing the relationship between review length and number of entities extracted.
 
@@ -57,21 +74,26 @@ def plot_review_length_vs_entities_violin(reviews:List[str], report:dict, save_p
     entity_counts = []
     zero_count = 0
     for review_id in range(len(reviews)):
-        count = sum(
-            review_id in entity_data["positive_reviews"]["ids"] or review_id in entity_data["negative_reviews"]["ids"]
-            for entity_data in report.values()
-        )
+        count = sum(review_id in entity_data["positive_reviews"]["ids"] or
+                    review_id in entity_data["negative_reviews"]["ids"]
+                    for entity_data in report.values())
         entity_counts.append(count)
-        if count==0:
-            zero_count+=1
-    
+        if count == 0:
+            zero_count += 1
+
     # Determine dynamic bins using percentiles
-    num_bins = 8  
+    num_bins = 8
     bin_edges = np.percentile(review_lengths, np.linspace(0, 100, num_bins + 1))
-    bin_labels = [f"{int(bin_edges[i])}-{int(bin_edges[i+1])}" for i in range(len(bin_edges)-1)]
+    bin_labels = [
+        f"{int(bin_edges[i])}-{int(bin_edges[i+1])}"
+        for i in range(len(bin_edges) - 1)
+    ]
 
     # Assign reviews to bins
-    bins = pd.cut(review_lengths, bins=bin_edges, labels=bin_labels, include_lowest=True)
+    bins = pd.cut(review_lengths,
+                  bins=bin_edges,
+                  labels=bin_labels,
+                  include_lowest=True)
     df = pd.DataFrame({"Length Bin": bins, "Entity Count": entity_counts})
 
     plt.figure(figsize=(12, 8))
@@ -84,7 +106,8 @@ def plot_review_length_vs_entities_violin(reviews:List[str], report:dict, save_p
 
 
 # Sentiment Intensity Heatmap
-def plot_sentiment_heatmap(report:dict, save_path:str="./sentiment_heatmap.png")->None:
+def plot_sentiment_heatmap(report: dict,
+                           save_path: str = "./sentiment_heatmap.png") -> None:
     """
     Generates and saves a heatmap visualizing the distribution of positive and negative review counts for each extracted entity.
 
@@ -103,11 +126,15 @@ def plot_sentiment_heatmap(report:dict, save_path:str="./sentiment_heatmap.png")
     for entity, details in report.items():
         pos_count = details["positive_reviews"]["count"]
         neg_count = details["negative_reviews"]["count"]
-        sentiment_intensity = (pos_count - neg_count) / max((pos_count + neg_count), 1)  # Normalized score
+        sentiment_intensity = (pos_count - neg_count) / max(
+            (pos_count + neg_count), 1)  # Normalized score
         entity_names.append(entity)
         sentiment_scores.append(sentiment_intensity)
 
-    df = pd.DataFrame({"Entity": entity_names, "Sentiment Score": sentiment_scores})
+    df = pd.DataFrame({
+        "Entity": entity_names,
+        "Sentiment Score": sentiment_scores
+    })
     df = df.pivot_table(index="Entity", values="Sentiment Score")
     df = df.sort_values(by="Sentiment Score", ascending=False)
 
@@ -127,23 +154,30 @@ def plot_sentiment_heatmap(report:dict, save_path:str="./sentiment_heatmap.png")
         ("0 (Neutral)", "white"),
         ("-1 (Mostly Negative)", "purple"),
     ]
-    
-    legend_patches = [plt.Line2D([0], [0], color=color, marker='s', markersize=12, linestyle="") for _, color in legend_labels]
-    plt.legend(
-        legend_patches,
-        [label for label, _ in legend_labels],
-        loc="upper right",
-        bbox_to_anchor=(1.5, 1.0),
-        title="Sentiment Score",
-        fontsize=12,
-        title_fontsize=12)
+
+    legend_patches = [
+        plt.Line2D([0], [0],
+                   color=color,
+                   marker='s',
+                   markersize=12,
+                   linestyle="") for _, color in legend_labels
+    ]
+    plt.legend(legend_patches, [label for label, _ in legend_labels],
+               loc="upper right",
+               bbox_to_anchor=(1.5, 1.0),
+               title="Sentiment Score",
+               fontsize=12,
+               title_fontsize=12)
 
     plt.savefig(save_path, bbox_inches="tight")
     plt.close()
 
 
-
-def plot_sentiment_trend(entity_name:str, data_df:pd.DataFrame, report:dict, save_path:str="./trend.png", time_interval:str="D")->None:
+def plot_sentiment_trend(entity_name: str,
+                         data_df: pd.DataFrame,
+                         report: dict,
+                         save_path: str = "./trend.png",
+                         time_interval: str = "D") -> None:
     """
     Generates and saves a plots displaying the trend of sentiments over time for a given entity.
 
@@ -167,27 +201,37 @@ def plot_sentiment_trend(entity_name:str, data_df:pd.DataFrame, report:dict, sav
     pos_reviews = entity_data.get("positive_reviews", {}).get("ids", [])
     neg_reviews = entity_data.get("negative_reviews", {}).get("ids", [])
 
-
     # Filter dataframe for matching review IDs
-    df_pos = data_df[data_df.index.isin(pos_reviews)].copy() if pos_reviews else pd.DataFrame(columns=data_df.columns)
-    df_neg = data_df[data_df.index.isin(neg_reviews)].copy() if neg_reviews else pd.DataFrame(columns=data_df.columns)
+    df_pos = data_df[data_df.index.isin(pos_reviews)].copy(
+    ) if pos_reviews else pd.DataFrame(columns=data_df.columns)
+    df_neg = data_df[data_df.index.isin(neg_reviews)].copy(
+    ) if neg_reviews else pd.DataFrame(columns=data_df.columns)
 
- 
     # Group by time and count occurrences
     if not df_pos.empty:
         df_pos["sentiment"] = "Positive"
     if not df_neg.empty:
-        df_neg["sentiment"] = "Negative" 
+        df_neg["sentiment"] = "Negative"
     df_trend = pd.concat([df_pos, df_neg])
-    df_trend = df_trend.groupby([pd.Grouper(key="Time_submitted", freq=time_interval), "sentiment"]).size().unstack(fill_value=0)
+    df_trend = df_trend.groupby(
+        [pd.Grouper(key="Time_submitted", freq=time_interval),
+         "sentiment"]).size().unstack(fill_value=0)
 
     # Plot sentiment trends
     plt.figure(figsize=(12, 15))
     if not df_pos.empty:
-        plt.plot(df_trend.index, df_trend.get("Positive", 0), label="Positive Sentiment", color="green", marker="o")
+        plt.plot(df_trend.index,
+                 df_trend.get("Positive", 0),
+                 label="Positive Sentiment",
+                 color="green",
+                 marker="o")
     if not df_neg.empty:
-        plt.plot(df_trend.index, df_trend.get("Negative", 0), label="Negative Sentiment", color="red", marker="o")
-    
+        plt.plot(df_trend.index,
+                 df_trend.get("Negative", 0),
+                 label="Negative Sentiment",
+                 color="red",
+                 marker="o")
+
     plt.xlabel("Time")
     plt.ylabel("Review Count")
     plt.title(f"Sentiment Trend for {entity_name}")

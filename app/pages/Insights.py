@@ -1,55 +1,64 @@
 import os
 import sys
-import streamlit as st
+
 import pandas as pd
+import streamlit as st
+
 sys.path.append("..")
+from Utils.analyzer_utils import load_analysis_report
+from Utils.analyzer_utils import load_csv
 import Utils.plotting_utils as plotter
-from Utils.analyzer_utils import load_csv, load_analysis_report
 
 # Set page title
 st.title("📈 Insights & Reports")
-st.write("Explore entity trends, sentiment distributions, and key patterns in the review data.")
-
+st.write(
+    "Explore entity trends, sentiment distributions, and key patterns in the review data."
+)
 
 plot_dir = "./static/plots"  # All plots needs to placed here
 os.makedirs(plot_dir, exist_ok=True)
 
 plots = {
     "Top Entities Mentioned": {
-        "file_path":"entity_frequency.png",
-        "description":"Identifies the most frequently mentioned entities in reviews."},
+        "file_path":
+            "entity_frequency.png",
+        "description":
+            "Identifies the most frequently mentioned entities in reviews."
+    },
     "Sentiment Intensity Heatmap": {
-        "file_path":"sentiment_heatmap.png",
-        "description":"Visualizes the intensity of sentiments are across all reviews."},
+        "file_path":
+            "sentiment_heatmap.png",
+        "description":
+            "Visualizes the intensity of sentiments are across all reviews."
+    },
     "Trend over time": {
-        "file_path" : "trend.png",
-        "description" : "Shows the distribution of sentiments over time"
-    }    
+        "file_path": "trend.png",
+        "description": "Shows the distribution of sentiments over time"
+    }
 }
 
 json_report_path = "./static/Analysis_report.json"
 report = load_analysis_report(json_report_path)
 
 review_csv_path = "../data/spotify_reviews.csv"
-data = load_csv(review_csv_path,columns=["Time_submitted","Review"], reviews_processed=34050)
+data = load_csv(review_csv_path,
+                columns=["Time_submitted", "Review"],
+                reviews_processed=34050)
 
-tab1,tab2,tab3,tab4 = st.tabs(["Report","Entity Frequency", "Sentiment Distrubution", "Trend over time"])
-
+tab1, tab2, tab3, tab4 = st.tabs(
+    ["Report", "Entity Frequency", "Sentiment Distrubution", "Trend over time"])
 
 # Tab 1: Report
 with tab1:
     # Convert dict to DataFrame
-    df = pd.DataFrame([
-        {
-            "Entity": entity,
-            "Positive": details["positive_reviews"]["count"],
-            "Negative": details["negative_reviews"]["count"],
-        }
-        for entity, details in report.items()
-    ])
+    df = pd.DataFrame([{
+        "Entity": entity,
+        "Positive": details["positive_reviews"]["count"],
+        "Negative": details["negative_reviews"]["count"],
+    } for entity, details in report.items()])
     # Sort by entity name (alphabetical order)
     df = df.sort_values(by="Entity")
-    df.index = range(1, len(df)+1)
+    df.index = range(1, len(df) + 1)
     # Display Table
     st.header("Entity Sentiment Summary")
     st.dataframe(df, use_container_width=True)
@@ -63,12 +72,14 @@ with tab2:
         plotter.plot_entity_frequency(
             report=report,
             top_k=20,
-            save_path=plot_path,        )
+            save_path=plot_path,
+        )
 
-    st.image(plot_path, caption=plots[selected_plot]["description"], use_container_width=True)
+    st.image(plot_path,
+             caption=plots[selected_plot]["description"],
+             use_container_width=True)
 
-    st.markdown(
-        """
+    st.markdown("""
         # Key Observations
 
         - **Spotify App** is the most frequently mentioned entity, with **15,612** mentions, significantly higher than other entities.
@@ -84,8 +95,7 @@ with tab2:
         ## Overall Insights:
         - The most mentioned entities generally revolve around **core functionality (Spotify App, Playlists, Player Controls, UI, Audio Quality)** and **monetization factors (Ads, Subscription Cost).**
         - Features with lower mentions might indicate **lesser user engagement** or **lack of awareness**.
-        """
-    )
+        """)
 
 # Tab 3 : Sentiment Distrubution
 with tab3:
@@ -93,28 +103,25 @@ with tab3:
     plot_path = os.path.join(plot_dir, plots[selected_plot]["file_path"])
 
     if not os.path.exists(plot_path):
-        plotter.plot_sentiment_heatmap(
-            report=report,
-            save_path=plot_path)
+        plotter.plot_sentiment_heatmap(report=report, save_path=plot_path)
 
-    st.image(plot_path, caption=plots[selected_plot]["description"], use_container_width=True)
+    st.image(plot_path,
+             caption=plots[selected_plot]["description"],
+             use_container_width=True)
 
     with st.container(border=True):
         st.markdown("**How is the sentiment score calulated?**")
         st.latex(r"""
         \frac{\text{positive count} - \text{negative count}}{\text{max(positive count + negative count,1)}} \times 100
         """)
-        st.markdown(
-            """
+        st.markdown("""
             **Why is this effective?**
             - Simple, informative and easy to understand.
             - Normalizes the score between -1 (fully negative) to +1 (fully positive).
             - Works well for imbalanced sentiment distributions (e.g., when positive or negative reviews dominate).
-            """
-        )
-    
-    st.markdown(
-        """
+            """)
+
+    st.markdown("""
         # Key Observations
         #### 🟩 Positive Sentiment:
         - **Music Selection (+0.63)** has the highest **positive sentiment**, indicating strong user appreciation.
@@ -137,8 +144,7 @@ with tab3:
         - **Subscription Cost, Ads, Player Controls, and Shuffle Feature are major pain points.**
         - **Login issues and UI customization (themes) have extremely negative sentiment.**
         
-        """
-    )
+        """)
 
 # Tab 3 : Trend over time
 with tab4:
@@ -149,9 +155,11 @@ with tab4:
     col1, col2 = st.columns([2, 1])  # Adjust width ratios if needed
     # Place widgets in respective columns
     with col1:
-        selected_entity = st.selectbox("🔍 Select an Entity:", sorted(report.keys()))  
+        selected_entity = st.selectbox("🔍 Select an Entity:",
+                                       sorted(report.keys()))
     with col2:
-        selected_interval = st.radio("⏳ Time Interval:", ["Daily", "Weekly"], horizontal=True)  
+        selected_interval = st.radio("⏳ Time Interval:", ["Daily", "Weekly"],
+                                     horizontal=True)
 
     # Generate plot
     plotter.plot_sentiment_trend(
@@ -159,6 +167,8 @@ with tab4:
         data_df=data,
         report=report,
         save_path=plot_path,
-        time_interval="D" if selected_interval=="Daily" else "W")
-    
-    st.image(plot_path, caption=plots[selected_plot]["description"], use_container_width=True)
+        time_interval="D" if selected_interval == "Daily" else "W")
+
+    st.image(plot_path,
+             caption=plots[selected_plot]["description"],
+             use_container_width=True)

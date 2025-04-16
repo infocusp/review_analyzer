@@ -1,10 +1,12 @@
-import os
+from copy import deepcopy
 import json
 import logging
+import os
+from typing import List
+
 import colorlog
 import pandas as pd
-from copy import deepcopy
-from typing import List
+
 
 class Logger:
     """Logger with support for colored outputs"""
@@ -13,7 +15,7 @@ class Logger:
         self.logger = logging.getLogger(name)
         self.logger.setLevel(level)
         self.logger.propagate = False  # Prevent duplicate logs
-        
+
         # Define log colors
         log_colors = {
             "DEBUG": "cyan",
@@ -29,9 +31,7 @@ class Logger:
             colorlog.ColoredFormatter(
                 "%(log_color)s%(asctime)s - %(levelname)s - %(message)s",
                 log_colors=log_colors,
-                datefmt="%Y-%m-%d %H:%M:%S"
-            )
-        )
+                datefmt="%Y-%m-%d %H:%M:%S"))
 
         # Avoid duplicate handlers
         if not self.logger.handlers:
@@ -43,7 +43,10 @@ class Logger:
 
 logger = Logger("Review Analyzer").get_logger()
 
-def load_csv(file_path: str, columns: List[str]=[], reviews_processed: int=None):
+
+def load_csv(file_path: str,
+             columns: List[str] = [],
+             reviews_processed: int = -1):
     """
     Loads data from a CSV file.
     
@@ -56,19 +59,21 @@ def load_csv(file_path: str, columns: List[str]=[], reviews_processed: int=None)
         df (pd.DataFrame): Dataframe containing all processed reviews
     """
     if not os.path.exists(file_path):
-        raise FileNotFoundError(f"Could not load csv, invalid path : {file_path}")
-    
+        raise FileNotFoundError(
+            f"Could not load csv, invalid path : {file_path}")
+
     if columns:
         df = pd.read_csv(file_path, usecols=columns)
     else:
-        df = pd.read_csv(file_path)    
+        df = pd.read_csv(file_path)
 
-    if reviews_processed:
+    if reviews_processed > 0:
         df = df[:reviews_processed]
-    
+
     return df
 
-def load_analysis_report(file_path:str)->dict:
+
+def load_analysis_report(file_path: str) -> dict:
     """
     Loads the json report
 
@@ -90,14 +95,16 @@ def load_analysis_report(file_path:str)->dict:
     # Convert lists to set inside each dictionary
     for entity_name, data in report.items():
         for key in ["positive_reviews", "negative_reviews"]:
-            data[key]["ids"] = set(data[key]["ids"]) 
-    return report          
+            data[key]["ids"] = set(data[key]["ids"])
+    return report
+
 
 def save_checkpoint(checkpoint, file_path):
     with open(file_path, "w") as f:
         json.dump(checkpoint, f, indent=4)
 
-def load_checkpoint(file_path:str)->dict:
+
+def load_checkpoint(file_path: str) -> dict:
     """
     Loads the saved json checkpoint
 
@@ -111,10 +118,17 @@ def load_checkpoint(file_path:str)->dict:
         with open(file_path, "r") as f:
             return json.load(f)
     except FileNotFoundError:
-        logger.warning(f"Unable to find previous chackoint at {file_path}, starting from scratch.")
-        return {"batch_size":None, "last_batch_idx": None, "existing_entities": []}
-    
-def save_analysis_report(aggregated_results:dict, file_path:str):
+        logger.warning(
+            f"Unable to find previous chackoint at {file_path}, starting from scratch."
+        )
+        return {
+            "batch_size": None,
+            "last_batch_idx": None,
+            "existing_entities": []
+        }
+
+
+def save_analysis_report(aggregated_results: dict, file_path: str):
     """
     Saves results dictionary as report json file.
 
@@ -131,7 +145,8 @@ def save_analysis_report(aggregated_results:dict, file_path:str):
     with open(file_path, "w") as f:
         json.dump([result], f, indent=4)
 
-def analyze_coverage(data:pd.DataFrame, report:dict):
+
+def analyze_coverage(data: pd.DataFrame, report: dict):
     """
     Extract coverage information from Analysis Report.
 
@@ -149,23 +164,28 @@ def analyze_coverage(data:pd.DataFrame, report:dict):
     for entity, details in report.items():
         entity_mentions.update(details["positive_reviews"]["ids"])
         entity_mentions.update(details["negative_reviews"]["ids"])
-    
+
     reviews = pd.DataFrame(data["Review"])
-    
+
     all_review_ids = set([i for i in range(len(reviews))])
-    reviews_ids_with_no_entities = list(all_review_ids.difference(entity_mentions))
-    
+    reviews_ids_with_no_entities = list(
+        all_review_ids.difference(entity_mentions))
+
     reviews_with_no_entities = reviews.iloc[reviews_ids_with_no_entities]
-    reviews_with_no_entities.index = range(1, len(reviews_with_no_entities)+1)
-    
+    reviews_with_no_entities.index = range(1, len(reviews_with_no_entities) + 1)
+
     coverage_report = {
-        "total_reviews":len(all_review_ids),
+        "total_reviews": len(all_review_ids),
         "unattended_reviews": reviews_with_no_entities
     }
 
     return coverage_report
 
-def get_reviews_for_entity(data:pd.DataFrame, report:dict, entity_name:str, sentiment:str="positive"):
+
+def get_reviews_for_entity(data: pd.DataFrame,
+                           report: dict,
+                           entity_name: str,
+                           sentiment: str = "positive"):
     """
     Fecthes reviews assigned to a particular entity-sentiment group
 

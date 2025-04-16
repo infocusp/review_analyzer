@@ -17,7 +17,7 @@ The system is primarily driven by few-shot prompting, batch-processing and conte
 # Setup
 Setp 1: Create a Virtual Environment (recommended)
 ```bash
-python3 -m venv <env_name>
+python3.10 -m venv <env_name>
 source <env_name>/bin/activate
 ```
 Step 2: Install dependencies:
@@ -33,13 +33,13 @@ step 3: Configure API Key for LLM:
 
 ```bash
 cd src
-python3 Analyzer.py
+python Analyzer.py
 ```
 
 # Launch Web-App
 ```bash
 cd app
-python3 streamlit run Home.py
+python streamlit run Home.py
 ```
 # Customization
 The current system is optimized for **Spotify user reviews**. If you want to analyse reviews for some other product or service, you need to:

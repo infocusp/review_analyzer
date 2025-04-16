@@ -4,7 +4,9 @@ from langchain_core.prompts import PromptTemplate
 spotify_examples = [
     [
         # Batch 1: Mixed cases (positive, negative, synonyms, same entity across reviews)
-        ("human", PromptTemplate.from_template("""Extract entities and sentiment from these reviews:
+        ("human",
+         PromptTemplate.from_template(
+             """Extract entities and sentiment from these reviews:
         review-101: The sound quality is fantastic! Love how crisp it is.
         review-102: The shuffle feature is completely useless.
         review-103: The audio is crystal clear, amazing clarity in music.
@@ -15,10 +17,11 @@ spotify_examples = [
             "Shuffle Feature": {{"positive_reviews": [], "negative_reviews": [102]}}
         }}"""),
     ],
-
     [
         # Batch 2: Standardization of synonyms + implicit sentiment
-        ("human", PromptTemplate.from_template("""Extract entities and sentiment from these reviews:
+        ("human",
+         PromptTemplate.from_template(
+             """Extract entities and sentiment from these reviews:
         review-201: The app experience is smooth and intuitive.
         review-202: Navigating through the UI is frustrating, too many unnecessary steps.Worst app ever.
         review-203: The interface is clean and easy to use.
@@ -29,10 +32,11 @@ spotify_examples = [
             "UI": {{"positive_reviews": [203,204], "negative_reviews": [202]}}
         }}"""),
     ],
-
     [
         # Batch 3: Mixed sentiment on the same entity
-        ("human", PromptTemplate.from_template("""Extract entities and sentiment from these reviews:
+        ("human",
+         PromptTemplate.from_template(
+             """Extract entities and sentiment from these reviews:
         review-301: The music selection is fantastic, but the ads are too frequent.
         review-302: Love the app, but way too many ads.
         review-303: The ads are ruining my experience.
@@ -43,10 +47,11 @@ spotify_examples = [
             "Ads": {{"positive_reviews": [], "negative_reviews": [301, 302, 303]}}
         }}"""),
     ],
-
     [
         # Batch 4: Handling ambiguous sentiment and comparisons
-        ("human", PromptTemplate.from_template("""Extract entities and sentiment from these reviews:
+        ("human",
+         PromptTemplate.from_template(
+             """Extract entities and sentiment from these reviews:
         review-401: The app is slightly better now, but the shuffle feature is still useless.
         review-402: Not bad, but I still expected more.
         review-403: The latest update is much better than before!
@@ -57,10 +62,11 @@ spotify_examples = [
             "Spotify App": {{"positive_reviews": [402, 403], "negative_reviews": [404]}}
         }}"""),
     ],
-
     [
         # Batch 5: Feature requests and implicit criticism
-        ("human", PromptTemplate.from_template("""Extract entities and sentiment from these reviews:
+        ("human",
+         PromptTemplate.from_template(
+             """Extract entities and sentiment from these reviews:
         review-501: Would be great if we had a dark mode option.
         review-502: Why is there still no offline lyrics support? Annoying!
         review-503: Offline mode is so helpful when traveling.
@@ -78,7 +84,9 @@ spotify_examples = [
 generalized_examples = [
     [
         # Example 1: Tech Product Reviews
-        ("human", PromptTemplate.from_template("""Extract entities and sentiment from these reviews:
+        ("human",
+         PromptTemplate.from_template(
+             """Extract entities and sentiment from these reviews:
         review-101: The battery life is incredible! Lasts all day without issues.
         review-102: The camera quality is disappointing, expected much better.
         review-103: Love the sleek design and display clarity of the phone.
@@ -94,7 +102,9 @@ generalized_examples = [
     ],
     [
         # Example 2: Streaming Service Reviews
-        ("human", PromptTemplate.from_template("""Extract entities and sentiment from these reviews:
+        ("human",
+         PromptTemplate.from_template(
+             """Extract entities and sentiment from these reviews:
         review-201: The video quality is amazing, even on slow internet.
         review-202: So many ads! It ruins the experience.
         review-203: The content selection is diverse and engaging.
@@ -110,7 +120,9 @@ generalized_examples = [
     ],
     [
         # Example 3: E-Commerce Reviews
-        ("human", PromptTemplate.from_template("""Extract entities and sentiment from these reviews:
+        ("human",
+         PromptTemplate.from_template(
+             """Extract entities and sentiment from these reviews:
         review-301: The delivery was super fast, received it in one day!
         review-302: The packaging was terrible, the product arrived damaged.
         review-303: Excellent customer support, resolved my issue immediately.
@@ -126,7 +138,9 @@ generalized_examples = [
     ],
     [
         # Example 4: Food Delivery App Reviews
-        ("human", PromptTemplate.from_template("""Extract entities and sentiment from these reviews:
+        ("human",
+         PromptTemplate.from_template(
+             """Extract entities and sentiment from these reviews:
         review-401: The app is easy to use, very intuitive.
         review-402: My order arrived 30 minutes late, really frustrating!
         review-403: The variety of food options is impressive but so many extra charges.
@@ -142,7 +156,9 @@ generalized_examples = [
     ],
     [
         # Example 5: SaaS Software Reviews
-        ("human", PromptTemplate.from_template("""Extract entities and sentiment from these reviews:
+        ("human",
+         PromptTemplate.from_template(
+             """Extract entities and sentiment from these reviews:
         review-501: The new update is really efficient, saves a lot of time. UI changes are on pint.
         review-502: The UI is confusing, takes too long to find basic features.
         review-503: Love the integration with third-party tools, very useful.The UI is awesome.
