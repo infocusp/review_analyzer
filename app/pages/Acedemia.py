@@ -3,7 +3,7 @@ import sys
 import streamlit as st
 
 sys.path.append("..")
-from Utils.analyzer_utils import load_csv
+from utils import analyzer_utils
 
 # Page Title
 st.title("🔍 Understanding Our AI-Powered Review Analysis Solution")
@@ -35,7 +35,8 @@ with tab2:
 
     # Load Sample CSV and Display Preview
     sample_csv_path = "../data/spotify_reviews.csv"
-    data = load_csv(sample_csv_path, columns=["Time_submitted", "Review"])
+    data = analyzer_utils.load_csv(sample_csv_path,
+                                   columns=["Time_submitted", "Review"])
     data.index = range(1, len(data) + 1)
     st.dataframe(data.head(20))
 

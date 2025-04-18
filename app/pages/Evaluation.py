@@ -5,11 +5,8 @@ import time
 import streamlit as st
 
 sys.path.append("..")
-from Utils.analyzer_utils import analyze_coverage
-from Utils.analyzer_utils import get_reviews_for_entity
-from Utils.analyzer_utils import load_analysis_report
-from Utils.analyzer_utils import load_csv
-import Utils.plotting_utils as plotter
+from utils import analyzer_utils
+from utils import plotting_utils
 
 # Page Title
 st.title("📊 Evaluation & Quality Assessment")
@@ -32,12 +29,12 @@ plot_files = {
 
 # Load Data and report
 json_report_path = "./static/Analysis_report.json"
-report = load_analysis_report(json_report_path)
+report = analyzer_utils.load_analysis_report(json_report_path)
 
 review_csv_path = "../data/spotify_reviews.csv"
-data = load_csv(review_csv_path,
-                columns=["Time_submitted", "Review"],
-                reviews_processed=34050)
+data = analyzer_utils.load_csv(review_csv_path,
+                               columns=["Time_submitted", "Review"],
+                               reviews_processed=34050)
 
 reviews = data["Review"].dropna().to_list()
 
@@ -49,7 +46,7 @@ with tab1:
         "Here, we measure the **proportion of reviews for which at least one entity is extracted** to ensure comprehensive coverage."
     )
 
-    coverage_report = analyze_coverage(data, report)
+    coverage_report = analyzer_utils.analyze_coverage(data, report)
     # Display the Metric
     total_reviews = coverage_report["total_reviews"]
     reviews_without_entities = coverage_report["unattended_reviews"]
@@ -107,7 +104,7 @@ with tab2:
     plot_path = os.path.join(plot_dir, "review_length_vs_entities_violin.png")
     if not os.path.exists(plot_path):
         # generate plot
-        plotter.plot_review_length_vs_entities_violin(
+        plotting_utils.plot_review_length_vs_entities_violin(
             reviews=data["Review"].dropna().to_list(),
             report=report,
             save_path=plot_path)
@@ -159,8 +156,9 @@ with tab3:
         selected_sentiment = st.radio("⏳ Sentiment:", ["positive", "negative"],
                                       horizontal=True)
 
-    reviews = get_reviews_for_entity(data=data,
-                                     report=report,
-                                     entity_name=selected_entity,
-                                     sentiment=selected_sentiment)
+    reviews = analyzer_utils.get_reviews_for_entity(
+        data=data,
+        report=report,
+        entity_name=selected_entity,
+        sentiment=selected_sentiment)
     st.dataframe(reviews)

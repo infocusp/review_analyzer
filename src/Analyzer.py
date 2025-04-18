@@ -1,45 +1,73 @@
 import json
 import sys
 import time
-from typing import List, Set
+from typing import Dict, List, Set, TypedDict
 
 from dotenv import load_dotenv
 from langchain.memory import ConversationBufferMemory
 from langchain_core.messages import AIMessage
 from langchain_google_genai import ChatGoogleGenerativeAI
-from tqdm import tqdm
+import tqdm
 
 import prompts
 
 sys.path.append("..")
-from Utils.analyzer_utils import load_analysis_report
-from Utils.analyzer_utils import load_checkpoint
-from Utils.analyzer_utils import load_csv
-from Utils.analyzer_utils import Logger
-from Utils.analyzer_utils import save_analysis_report
-from Utils.analyzer_utils import save_checkpoint
+from utils import analyzer_utils
 
-Mylogger = Logger("Review Analyzer")
+Mylogger = analyzer_utils.Logger("Review Analyzer")
 logger = Mylogger.get_logger()
 
 
+class EntityStats(TypedDict):
+    """
+    Represents review statistics for an entity across sentiment categories (positive or negative).
+
+    Attributes:
+        count: Total number of reviews in this category.
+        ids: A set of review IDs associated with this category.
+    """
+    count: int
+    ids: Set[int]
+
+
+class EntitySentimentMap(TypedDict):
+    """
+    Represents categorized review data for a single entity.
+
+    Attributes:
+        positive_reviews: Statistics and IDs for positive reviews.
+        negative_reviews: Statistics and IDs for negative reviews.
+    """
+    positive_reviews: EntityStats
+    negative_reviews: EntityStats
+
+
 class ReviewAnalyzer:
+    """
+    Class to analyze user reviews using LLM.
+    """
 
     def __init__(self,
-                 save_checkpoint_path="Checkpoint.json",
-                 save_result_path="Analysis_report.json"):
+                 checkpoint_path: str = "Checkpoint.json",
+                 report_path: str = "Analysis_report.json"):
+        """
+        ReviewAnalyzer parameters initialization
 
+        Args:
+            checkpoint_path (str) : path to save/load checkpoint.
+            report_path (str) : path to save/load the aggregated results(json report).
+        """
         # load the API Key from env variable
         load_dotenv()
-        # Initialize Gemini model (LangChain Wrapper)
+        # Initialize Gemini model
         self.llm = ChatGoogleGenerativeAI(model="gemini-2.0-flash")
         # Memory to track previously extracted entities
         self.memory = ConversationBufferMemory(memory_key="entities",
                                                return_messages=True)
-        self.ckpt_path = save_checkpoint_path
-        self.result_path = save_result_path
+        self.ckpt_path = checkpoint_path
+        self.result_path = report_path
 
-        self.aggregated_results = {}
+        self.aggregated_results: Dict[str, EntitySentimentMap] = {}
 
     def get_existing_entities(self, key: str) -> List[str]:
         """
@@ -64,12 +92,12 @@ class ReviewAnalyzer:
 
         return existing_entities
 
-    def process_batch_output(self, model_response: dict) -> Set[str]:
+    def process_batch_output(self, model_response: Dict) -> Set[str]:
         """
-        Processes the model's JSON response, updates the aggregated results, andmaintains entity memory.
+        Processes the model's response, updates the aggregated results, and maintains entity memory.
 
         Args:
-            model_response (dict): The structured response from the model.
+            model_response (Dict): The structured response from the model.
 
         Returns:
             batch_entities (Set[str]): entities recognized in current batch.
@@ -87,7 +115,7 @@ class ReviewAnalyzer:
             positive_reviews = set(reviews["positive_reviews"])
             negative_reviews = set(reviews["negative_reviews"])
 
-            # Ensuring entity exists in all_result
+            # Ensuring entity exists in aggregated_result
             if entity_name not in self.aggregated_results:
                 self.aggregated_results[entity_name] = {
                     "positive_reviews": {
@@ -114,13 +142,14 @@ class ReviewAnalyzer:
                 "count"] = len(self.aggregated_results[entity_name]
                                ["negative_reviews"]["ids"])
 
+            # Append to current batch entities
             batch_entities.add(entity_name)
 
         return batch_entities
 
     def update_entity_memory(self, batch_entities: Set[str]) -> None:
         """
-        Updates entity memory with new entities if any.
+        Updates entity memory with new entities, if any.
 
         Args:
             batch_entities (Set[str]): entities recognized in current batch.
@@ -129,6 +158,7 @@ class ReviewAnalyzer:
             None
         """
 
+        # Fetch existing entities from memory
         existing_entities = self.get_existing_entities(key="entities")
         entities_added = False
 
@@ -144,7 +174,6 @@ class ReviewAnalyzer:
             self.memory.clear()
             self.memory.save_context({"input": "Updating entity memory"},
                                      {"entities": existing_entities})
-            # print(f"entity list after merging new entities: \n{entity_list}")
             logger.info("Memory updated".upper())
         else:
             logger.info(
@@ -154,7 +183,7 @@ class ReviewAnalyzer:
 
     def process_reviews_in_batches(self,
                                    reviews: List[str],
-                                   batch_size: int = 50) -> dict:
+                                   batch_size: int = 50) -> Dict:
         """
         Processes user reviews in batches, extracting entities and sentiment from each batch.
 
@@ -163,7 +192,7 @@ class ReviewAnalyzer:
             batch_size (int, optional): The number of reviews to process in a single batch. Default is 50.
 
         Returns:
-            analysis_report (dict): A dictionary where each key is an entity and the value is a dictionary with 
+            analysis_report (Dict): A dictionary where each key is an entity and the value is a dictionary with 
                 "positive_reviews" and "negative_reviews" as keys mapping to lists of review IDs.
 
         Functionality:
@@ -176,7 +205,7 @@ class ReviewAnalyzer:
             - Update the checkpoint after processing each batch.
         """
 
-        checkpoint = load_checkpoint(self.ckpt_path)
+        checkpoint = analyzer_utils.load_checkpoint(self.ckpt_path)
 
         if checkpoint["batch_size"] is None:  # Register batch-size in checkpoint
             checkpoint["batch_size"] = batch_size
@@ -193,10 +222,11 @@ class ReviewAnalyzer:
                 "Loading previously extracted entities from checkpoint to memory"
             )
             self.update_entity_memory(checkpoint["existing_entities"])
-            self.aggregated_results = load_analysis_report(self.result_path)
+            self.aggregated_results = analyzer_utils.load_analysis_report(
+                self.result_path)
 
         # extract reviews and process batch
-        for batch_start_idx in tqdm(range(0, len(reviews), batch_size)):
+        for batch_start_idx in tqdm.tqdm(range(0, len(reviews), batch_size)):
             print("- -" * 60)
 
             # Skip already completed batches
@@ -217,8 +247,6 @@ class ReviewAnalyzer:
                 for id, review in enumerate(batch)
             ])
 
-            # print(f"Input :\n{formatted_reviews}\n")
-
             # fetch existing entities from memory
             existing_entities = self.get_existing_entities(key="entities")
 
@@ -234,14 +262,18 @@ class ReviewAnalyzer:
             try:
                 logger.info("Invoking LLM ..")
                 t1 = time.perf_counter()
+                # LLM call
                 response = self.llm.invoke(formatted_prompt)
                 t2 = time.perf_counter()
-                print(f"time taken : {(t2-t1)*1000} ms")
+                print(f"time taken to process the batch: {(t2-t1)*1000} ms")
+                # Load json string to python dictionary
                 response_json = json.loads(response.content.strip("```json"))
+                # Process batch output
                 batch_entities = self.process_batch_output(response_json)
                 logger.info(
                     f"ENTITIES EXTRACTED IN CURRENT BATCH : {batch_entities}\n")
                 logger.info("Updating Memory")
+                # Update memory
                 self.update_entity_memory(batch_entities)
 
             except Exception as e:
@@ -258,9 +290,9 @@ class ReviewAnalyzer:
             checkpoint["existing_entities"] = self.get_existing_entities(
                 key="entities")
 
-            save_checkpoint(checkpoint, file_path=self.ckpt_path)
-            save_analysis_report(self.aggregated_results,
-                                 file_path=self.result_path)
+            analyzer_utils.save_checkpoint(checkpoint, file_path=self.ckpt_path)
+            analyzer_utils.save_analysis_report(self.aggregated_results,
+                                                file_path=self.result_path)
             time.sleep(2)  # To Prevent rate limit issues
         else:
             logger.info(
@@ -270,13 +302,13 @@ class ReviewAnalyzer:
 
 def main(csv_file):
 
-    data = load_csv(csv_file)
+    data = analyzer_utils.load_csv(csv_file)
     reviews = data["Review"].dropna().tolist()
 
-    save_checkpoint_path = "./Checkpoint.json"
-    save_result_path = "Analysis_report.json"
+    checkpoint_path = "./Checkpoint.json"
+    report_path = "Analysis_report.json"
 
-    analyzer = ReviewAnalyzer(save_checkpoint_path, save_result_path)
+    analyzer = ReviewAnalyzer(checkpoint_path, report_path)
     analysis_report = analyzer.process_reviews_in_batches(reviews,
                                                           batch_size=50)
 

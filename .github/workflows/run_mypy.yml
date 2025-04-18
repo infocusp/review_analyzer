@@ -1,0 +1,18 @@
+name: Mypy Type Check
+
+on: [push]
+
+jobs:
+  type-check:
+    name: Type Checking
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: 3.10
+    - name: Install mypy
+      run: pip install mypy
+    - name: Run Mypy
+      run: mypy .

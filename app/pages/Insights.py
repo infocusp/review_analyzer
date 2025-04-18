@@ -5,9 +5,8 @@ import pandas as pd
 import streamlit as st
 
 sys.path.append("..")
-from Utils.analyzer_utils import load_analysis_report
-from Utils.analyzer_utils import load_csv
-import Utils.plotting_utils as plotter
+from utils import analyzer_utils
+from utils import plotting_utils
 
 # Set page title
 st.title("📈 Insights & Reports")
@@ -38,12 +37,12 @@ plots = {
 }
 
 json_report_path = "./static/Analysis_report.json"
-report = load_analysis_report(json_report_path)
+report = analyzer_utils.load_analysis_report(json_report_path)
 
 review_csv_path = "../data/spotify_reviews.csv"
-data = load_csv(review_csv_path,
-                columns=["Time_submitted", "Review"],
-                reviews_processed=34050)
+data = analyzer_utils.load_csv(review_csv_path,
+                               columns=["Time_submitted", "Review"],
+                               reviews_processed=34050)
 
 tab1, tab2, tab3, tab4 = st.tabs(
     ["Report", "Entity Frequency", "Sentiment Distrubution", "Trend over time"])
@@ -69,7 +68,7 @@ with tab2:
     plot_path = os.path.join(plot_dir, plots[selected_plot]["file_path"])
 
     if not os.path.exists(plot_path):
-        plotter.plot_entity_frequency(
+        plotting_utils.plot_entity_frequency(
             report=report,
             top_k=20,
             save_path=plot_path,
@@ -103,7 +102,8 @@ with tab3:
     plot_path = os.path.join(plot_dir, plots[selected_plot]["file_path"])
 
     if not os.path.exists(plot_path):
-        plotter.plot_sentiment_heatmap(report=report, save_path=plot_path)
+        plotting_utils.plot_sentiment_heatmap(report=report,
+                                              save_path=plot_path)
 
     st.image(plot_path,
              caption=plots[selected_plot]["description"],
@@ -162,7 +162,7 @@ with tab4:
                                      horizontal=True)
 
     # Generate plot
-    plotter.plot_sentiment_trend(
+    plotting_utils.plot_sentiment_trend(
         entity_name=selected_entity,
         data_df=data,
         report=report,

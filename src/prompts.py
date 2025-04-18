@@ -3,7 +3,7 @@ from typing import List, Tuple, Union
 from langchain.prompts import ChatPromptTemplate
 from langchain.prompts import PromptTemplate
 
-from few_shot_examples import spotify_examples
+import few_shot_examples
 
 
 def format_assistant_examples(
@@ -60,13 +60,12 @@ def get_user_prompt(
                                        formatted_reviews=formatted_reviews)
 
 
-def get_system_propmt(existing_entities: List[str] = []):
+def get_system_propmt(existing_entities: List[str] = []) -> str:
     """
     Generates a structured system prompt using PromptTemplate.
 
     Args:
         existing_entities(List[str]): List of extracted entities.
-        task_description(str): Command to the model.
     
     Returns:
       user prompt (str): A formatted system prompt.
@@ -98,7 +97,7 @@ def get_system_propmt(existing_entities: List[str] = []):
 
 chat_prompt_template = ChatPromptTemplate.from_messages([
     ("system", "{system_prompt}"),  # System message
-    *format_assistant_examples(
-        spotify_examples),  # Example input/output from assistant
+    *format_assistant_examples(few_shot_examples.spotify_examples
+                              ),  # Example input/output from assistant
     ("user", "{user_prompt}")  # User's actual input
 ])

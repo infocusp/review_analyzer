@@ -2,7 +2,7 @@ from copy import deepcopy
 import json
 import logging
 import os
-from typing import List
+from typing import Dict, List
 
 import colorlog
 import pandas as pd
@@ -73,7 +73,7 @@ def load_csv(file_path: str,
     return df
 
 
-def load_analysis_report(file_path: str) -> dict:
+def load_analysis_report(file_path: str) -> Dict:
     """
     Loads the json report
 
@@ -81,7 +81,7 @@ def load_analysis_report(file_path: str) -> dict:
         file_path (str): path to analysis report (json file).
 
     Returns:
-        report (dict): dict containing parsed json data     
+        report (Dict): dict containing parsed json data     
     """
 
     try:
@@ -104,7 +104,7 @@ def save_checkpoint(checkpoint, file_path):
         json.dump(checkpoint, f, indent=4)
 
 
-def load_checkpoint(file_path: str) -> dict:
+def load_checkpoint(file_path: str) -> Dict:
     """
     Loads the saved json checkpoint
 
@@ -112,7 +112,7 @@ def load_checkpoint(file_path: str) -> dict:
         file_path (str): path to chackpoint (json file).
 
     Returns:
-        report (dict): dict containing parsed json data     
+        report (Dict): dict containing parsed json data     
     """
     try:
         with open(file_path, "r") as f:
@@ -128,12 +128,12 @@ def load_checkpoint(file_path: str) -> dict:
         }
 
 
-def save_analysis_report(aggregated_results: dict, file_path: str):
+def save_analysis_report(aggregated_results: Dict, file_path: str):
     """
     Saves results dictionary as report json file.
 
     Args:
-       aggregated_results (dict): A dictionary where each key is an entity and the value is a dictionary with 
+       aggregated_results (Dict): A dictionary where each key is an entity and the value is a dictionary with 
         "positive_reviews" and "negative_reviews" as keys mapping to lists of review IDs.
        file_path (str): path to save json report 
     """
@@ -146,17 +146,17 @@ def save_analysis_report(aggregated_results: dict, file_path: str):
         json.dump([result], f, indent=4)
 
 
-def analyze_coverage(data: pd.DataFrame, report: dict):
+def analyze_coverage(data: pd.DataFrame, report: Dict):
     """
     Extract coverage information from Analysis Report.
 
     args:
         data (pd.DataFrame): Dataframe containing all processed reviews
-        report (dict): A dictionary where each key is an entity and the value is a dictionary with 
+        report (Dict): A dictionary where each key is an entity and the value is a dictionary with 
         "positive_reviews" and "negative_reviews" as keys mapping to lists of review IDs.
 
     Returns:
-        coverage_report (dict):
+        coverage_report (Dict):
             total_reviews (int): number of reviews processed.
             unattended_reviews (pd.DataFrame): Dataframe containing reviews for which no entity was assigned.
     """
@@ -183,7 +183,7 @@ def analyze_coverage(data: pd.DataFrame, report: dict):
 
 
 def get_reviews_for_entity(data: pd.DataFrame,
-                           report: dict,
+                           report: Dict,
                            entity_name: str,
                            sentiment: str = "positive"):
     """
@@ -191,9 +191,10 @@ def get_reviews_for_entity(data: pd.DataFrame,
 
     Args:
         data (pd.DataFrame): Dataframe containing all processed reviews
-        report (dict): A dictionary where each key is an entity and the value is a dictionary with 
+        report (Dict): A dictionary where each key is an entity and the value is a dictionary with 
         "positive_reviews" and "negative_reviews" as keys mapping to lists of review IDs.
-        entity_name (str): Name of entity
+        entity_name (str): Name of entity to be queried
+        sentiment (str): Sentiment to be queried
 
     Returns:
         selected_reviews(pd.DataFrame): DataFrame containing only Reviews assigned to given entity-sentiment group.

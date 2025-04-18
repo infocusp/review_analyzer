@@ -1,4 +1,4 @@
-from typing import List
+from typing import Dict, List
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -7,14 +7,14 @@ import seaborn as sns
 
 
 #  Entity Frequency (Top Entities)
-def plot_entity_frequency(report: dict,
+def plot_entity_frequency(report: Dict,
                           top_k: int = 10,
                           save_path: str = "./entity_frequency.png") -> None:
     """
     Generates and saves a bar plot of the most frequently mentioned entities in the review analysis report.
 
     Args:
-        report (dict): A dictionary where each key is an entity and the value is a dictionary with 
+        report (Dict): A dictionary where each key is an entity and the value is a dictionary with 
         "positive_reviews" and "negative_reviews" as keys mapping to lists of review IDs.
         top_k (int, optional): The number of top entities to include in the plot. Defaults to 10.
         save_path (str, optional): File path where the plot image will be saved. Defaults to './entity_frequency.png'.
@@ -56,14 +56,14 @@ def plot_entity_frequency(report: dict,
 # Review length vs Entities extracted
 def plot_review_length_vs_entities_violin(
         reviews: List[str],
-        report: dict,
+        report: Dict,
         save_path: str = "./review_length_vs_entities_violin.png") -> None:
     """
     Generates and saves a violin plot showcasing the relationship between review length and number of entities extracted.
 
     Args:
         reviews (List[str]): List of reviews.
-        report (dict): A dictionary where each key is an entity and the value is a dictionary with 
+        report (Dict): A dictionary where each key is an entity and the value is a dictionary with 
         "positive_reviews" and "negative_reviews" as keys mapping to lists of review IDs.
         save_path (str, optional): File path where the plot image will be saved. Defaults to './review_length_vs_entities_violin.png'.
     
@@ -106,13 +106,13 @@ def plot_review_length_vs_entities_violin(
 
 
 # Sentiment Intensity Heatmap
-def plot_sentiment_heatmap(report: dict,
+def plot_sentiment_heatmap(report: Dict,
                            save_path: str = "./sentiment_heatmap.png") -> None:
     """
     Generates and saves a heatmap visualizing the distribution of positive and negative review counts for each extracted entity.
 
     Args:
-        report (dict): A dictionary where each key is an entity and the value is a dictionary containing 
+        report (Dict): A dictionary where each key is an entity and the value is a dictionary containing 
             "positive_reviews" and "negative_reviews" lists with review IDs.
             
         save_path (str, optional): File path where the heatmap image will be saved. Defaults to './sentiment_heatmap.png'.
@@ -175,7 +175,7 @@ def plot_sentiment_heatmap(report: dict,
 
 def plot_sentiment_trend(entity_name: str,
                          data_df: pd.DataFrame,
-                         report: dict,
+                         report: Dict,
                          save_path: str = "./trend.png",
                          time_interval: str = "D") -> None:
     """
@@ -183,7 +183,7 @@ def plot_sentiment_trend(entity_name: str,
 
     Args:
         entity_name (str): The entity to visualize (e.g., "Notifications").
-        report (dict): A dictionary where each key is an entity and the value is a dictionary with 
+        report (Dict): A dictionary where each key is an entity and the value is a dictionary with 
         "positive_reviews" and "negative_reviews" as keys mapping to lists of review IDs.
         data_df (pd.DataFrame): DataFrame containing "Time_submitted" and review IDs.
         save_path (str, optional): File path where the heatmap image will be saved. Defaults to './trend.png'.

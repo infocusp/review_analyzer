@@ -1,8 +1,8 @@
 #virtual env
-review_analsis_venv/
+*_venv/
 
 #data
-# data/
+data/
 
 #pychahe
 *.pyc
