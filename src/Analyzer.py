@@ -207,9 +207,9 @@ class ReviewAnalyzer:
 
         checkpoint = analyzer_utils.load_checkpoint(self.ckpt_path)
 
-        if checkpoint["batch_size"] is None:  # Register batch-size in checkpoint
+        if checkpoint["batch_size"] is None:
             checkpoint["batch_size"] = batch_size
-        else:  # Ensure the batch-size is same as used in previous checkpoint
+        else:
             assert checkpoint[
                 "batch_size"] == batch_size, f"batch size Mismatch, Checkpoint: {checkpoint['batch_size']}, Current: {batch_size}"
 
