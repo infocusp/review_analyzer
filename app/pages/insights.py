@@ -1,12 +1,13 @@
+import json
 import os
-import sys
 
 import pandas as pd
 import streamlit as st
 
-sys.path.append("..")
 from utils import analyzer_utils
+from utils import constants
 from utils import plotting_utils
+from utils import pydantic_models
 
 # Set page title
 st.title("📈 Insights & Reports")
@@ -14,7 +15,7 @@ st.write(
     "Explore entity trends, sentiment distributions, and key patterns in the review data."
 )
 
-plot_dir = "./static/plots"  # All plots needs to placed here
+plot_dir = constants.plot_dir
 os.makedirs(plot_dir, exist_ok=True)
 
 plots = {
@@ -36,13 +37,14 @@ plots = {
     }
 }
 
-json_report_path = "./static/Analysis_report.json"
-report = analyzer_utils.load_analysis_report(json_report_path)
+# Load analysis report
+with open(constants.analysis_report_path, "r") as f:
+    raw = json.load(f)
+    report = pydantic_models.AggregatedResults.parse_obj(raw)
 
-review_csv_path = "../data/spotify_reviews.csv"
-data = analyzer_utils.load_csv(review_csv_path,
-                               columns=["Time_submitted", "Review"],
-                               reviews_processed=34050)
+data = analyzer_utils.load_csv(file_path=constants.data_csv_path,
+                               columns=constants.features_to_use,
+                               reviews_processed=constants.reviews_processed)
 
 tab1, tab2, tab3, tab4 = st.tabs(
     ["Report", "Entity Frequency", "Sentiment Distrubution", "Trend over time"])
@@ -52,9 +54,9 @@ with tab1:
     # Convert dict to DataFrame
     df = pd.DataFrame([{
         "Entity": entity,
-        "Positive": details["positive_reviews"]["count"],
-        "Negative": details["negative_reviews"]["count"],
-    } for entity, details in report.items()])
+        "Positive": sentiment_map.positive_reviews.count,
+        "Negative": sentiment_map.negative_reviews.count,
+    } for entity, sentiment_map in report.items()])
     # Sort by entity name (alphabetical order)
     df = df.sort_values(by="Entity")
     df.index = range(1, len(df) + 1)

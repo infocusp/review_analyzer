@@ -1,9 +1,7 @@
-import sys
-
 import streamlit as st
 
-sys.path.append("..")
 from utils import analyzer_utils
+from utils import constants
 
 # Page Title
 st.title("🔍 Understanding Our AI-Powered Review Analysis Solution")
@@ -20,8 +18,7 @@ with tab1:
     st.write(
         "The following diagram illustrates how our review analysis system works, from data ingestion to final insights."
     )
-    design_diagram_path = "static/high_level_design.png"
-    st.image(design_diagram_path,
+    st.image(image=constants.hld_img_path,
              caption="High-Level System Architecture",
              use_container_width=True)
 
@@ -34,9 +31,8 @@ with tab2:
     st.write("A glance at the customer reviews dataset before processing.")
 
     # Load Sample CSV and Display Preview
-    sample_csv_path = "../data/spotify_reviews.csv"
-    data = analyzer_utils.load_csv(sample_csv_path,
-                                   columns=["Time_submitted", "Review"])
+    data = analyzer_utils.load_csv(file_path=constants.data_csv_path,
+                                   columns=constants.features_to_use)
     data.index = range(1, len(data) + 1)
     st.dataframe(data.head(20))
 

@@ -3,14 +3,13 @@ from typing import List, Tuple, Union
 from langchain.prompts import ChatPromptTemplate
 from langchain.prompts import PromptTemplate
 
-import few_shot_examples
+from src import few_shot_examples
 
 
 def format_assistant_examples(
     example_reviews: List[List[Tuple[str, Union[PromptTemplate, str]]]]
 ) -> List[Tuple[str, str]]:
-    """
-    Arranges all assistant examples in a chat format.
+    """Arranges all assistant examples in a chat format.
     
     Args:
         example_reviews (List[List[Tuple[str, Union[PromptTemplate, str]]]): 
@@ -39,8 +38,7 @@ def get_user_prompt(
     formatted_reviews: str,
     task_description: str = "Extract entities and sentiment from these reviews:"
 ) -> str:
-    """
-    Generates a structured user prompt using PromptTemplate.
+    """Generates a structured user prompt using PromptTemplate.
 
     Args:
         formatted_reviews(str): The reviews formatted as a string.
@@ -61,8 +59,7 @@ def get_user_prompt(
 
 
 def get_system_propmt(existing_entities: List[str] = []) -> str:
-    """
-    Generates a structured system prompt using PromptTemplate.
+    """Generates a structured system prompt using PromptTemplate.
 
     Args:
         existing_entities(List[str]): List of extracted entities.

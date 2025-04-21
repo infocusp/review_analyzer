@@ -1,5 +1,3 @@
-from copy import deepcopy
-import json
 import logging
 import os
 from typing import Dict, List
@@ -7,9 +5,11 @@ from typing import Dict, List
 import colorlog
 import pandas as pd
 
+from utils import pydantic_models
+
 
 class Logger:
-    """Logger with support for colored outputs"""
+    """Logger with support for colored outputs."""
 
     def __init__(self, name: str = "app", level=logging.DEBUG):
         self.logger = logging.getLogger(name)
@@ -46,9 +46,8 @@ logger = Logger("Review Analyzer").get_logger()
 
 def load_csv(file_path: str,
              columns: List[str] = [],
-             reviews_processed: int = -1):
-    """
-    Loads data from a CSV file.
+             reviews_processed: int = -1) -> pd.DataFrame:
+    """Loads data from a CSV file.
     
     Args:
         file_path (str): path to csv file.
@@ -62,98 +61,24 @@ def load_csv(file_path: str,
         raise FileNotFoundError(
             f"Could not load csv, invalid path : {file_path}")
 
-    if columns:
-        df = pd.read_csv(file_path, usecols=columns)
-    else:
-        df = pd.read_csv(file_path)
-
+    kwargs: Dict[str, int | List[str]] = {}
     if reviews_processed > 0:
-        df = df[:reviews_processed]
+        kwargs['nrows'] = reviews_processed
+    if columns:
+        kwargs['usecols'] = columns
 
+    df = pd.read_csv(file_path, **kwargs)
     return df
 
 
-def load_analysis_report(file_path: str) -> Dict:
-    """
-    Loads the json report
-
-    Args:
-        file_path (str): path to analysis report (json file).
-
-    Returns:
-        report (Dict): dict containing parsed json data     
-    """
-
-    try:
-        with open(file_path, "r") as f:
-            report = json.load(f)
-            report = report[0]
-    except FileNotFoundError:
-        logger.warning(f"Invalid path for Analysis report: {file_path}")
-        return {}
-
-    # Convert lists to set inside each dictionary
-    for entity_name, data in report.items():
-        for key in ["positive_reviews", "negative_reviews"]:
-            data[key]["ids"] = set(data[key]["ids"])
-    return report
-
-
-def save_checkpoint(checkpoint, file_path):
-    with open(file_path, "w") as f:
-        json.dump(checkpoint, f, indent=4)
-
-
-def load_checkpoint(file_path: str) -> Dict:
-    """
-    Loads the saved json checkpoint
-
-    Args:
-        file_path (str): path to chackpoint (json file).
-
-    Returns:
-        report (Dict): dict containing parsed json data     
-    """
-    try:
-        with open(file_path, "r") as f:
-            return json.load(f)
-    except FileNotFoundError:
-        logger.warning(
-            f"Unable to find previous chackoint at {file_path}, starting from scratch."
-        )
-        return {
-            "batch_size": None,
-            "last_batch_idx": None,
-            "existing_entities": []
-        }
-
-
-def save_analysis_report(aggregated_results: Dict, file_path: str):
-    """
-    Saves results dictionary as report json file.
-
-    Args:
-       aggregated_results (Dict): A dictionary where each key is an entity and the value is a dictionary with 
-        "positive_reviews" and "negative_reviews" as keys mapping to lists of review IDs.
-       file_path (str): path to save json report 
-    """
-    result = deepcopy(aggregated_results)
-    # Convert sets to lists inside each dictionary
-    for entity_name, data in result.items():
-        for key in ["positive_reviews", "negative_reviews"]:
-            data[key]["ids"] = list(data[key]["ids"])  # Convert sets to lists
-    with open(file_path, "w") as f:
-        json.dump([result], f, indent=4)
-
-
-def analyze_coverage(data: pd.DataFrame, report: Dict):
-    """
-    Extract coverage information from Analysis Report.
+def analyze_coverage(data: pd.DataFrame,
+                     report: pydantic_models.AggregatedResults) -> Dict:
+    """Extract coverage information from Analysis Report.
 
     args:
         data (pd.DataFrame): Dataframe containing all processed reviews
-        report (Dict): A dictionary where each key is an entity and the value is a dictionary with 
-        "positive_reviews" and "negative_reviews" as keys mapping to lists of review IDs.
+        report (AggregatedResults): A Pydantic object where each key is an entity, and the value is
+            an EntitySentimentMap containing "positive_reviews" and "negative_reviews" with sets of review IDS and  count.
 
     Returns:
         coverage_report (Dict):
@@ -161,9 +86,9 @@ def analyze_coverage(data: pd.DataFrame, report: Dict):
             unattended_reviews (pd.DataFrame): Dataframe containing reviews for which no entity was assigned.
     """
     entity_mentions = set()
-    for entity, details in report.items():
-        entity_mentions.update(details["positive_reviews"]["ids"])
-        entity_mentions.update(details["negative_reviews"]["ids"])
+    for entity, sentiment_map in report.items():
+        entity_mentions.update(sentiment_map.positive_reviews.ids)
+        entity_mentions.update(sentiment_map.negative_reviews.ids)
 
     reviews = pd.DataFrame(data["Review"])
 
@@ -183,16 +108,15 @@ def analyze_coverage(data: pd.DataFrame, report: Dict):
 
 
 def get_reviews_for_entity(data: pd.DataFrame,
-                           report: Dict,
+                           report: pydantic_models.AggregatedResults,
                            entity_name: str,
-                           sentiment: str = "positive"):
-    """
-    Fecthes reviews assigned to a particular entity-sentiment group
+                           sentiment: str = "positive") -> pd.DataFrame:
+    """Fecthes reviews assigned to a particular entity-sentiment group.
 
     Args:
         data (pd.DataFrame): Dataframe containing all processed reviews
-        report (Dict): A dictionary where each key is an entity and the value is a dictionary with 
-        "positive_reviews" and "negative_reviews" as keys mapping to lists of review IDs.
+        report (AggregatedResults): A Pydantic object where each key is an entity, and the value is
+            an EntitySentimentMap containing "positive_reviews" and "negative_reviews" with sets of review IDS and  count.
         entity_name (str): Name of entity to be queried
         sentiment (str): Sentiment to be queried
 
@@ -200,7 +124,7 @@ def get_reviews_for_entity(data: pd.DataFrame,
         selected_reviews(pd.DataFrame): DataFrame containing only Reviews assigned to given entity-sentiment group.
     """
     sentiment += "_reviews"
-    review_ids = report[entity_name][sentiment]["ids"]
+    review_ids = getattr(report[entity_name], sentiment).ids
     selected_reviews = data.iloc[sorted(review_ids)]["Review"]
     selected_reviews.index = range(1, len(selected_reviews) + 1)
     return selected_reviews

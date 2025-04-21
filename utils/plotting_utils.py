@@ -5,17 +5,18 @@ import numpy as np
 import pandas as pd
 import seaborn as sns
 
+from utils import pydantic_models
+
 
 #  Entity Frequency (Top Entities)
-def plot_entity_frequency(report: Dict,
+def plot_entity_frequency(report: pydantic_models.AggregatedResults,
                           top_k: int = 10,
                           save_path: str = "./entity_frequency.png") -> None:
-    """
-    Generates and saves a bar plot of the most frequently mentioned entities in the review analysis report.
+    """Generates and saves a bar plot of the most frequently mentioned entities in the review analysis report.
 
     Args:
-        report (Dict): A dictionary where each key is an entity and the value is a dictionary with 
-        "positive_reviews" and "negative_reviews" as keys mapping to lists of review IDs.
+        report (AggregatedResults): A Pydantic object where each key is an entity, and the value is
+            an EntitySentimentMap containing "positive_reviews" and "negative_reviews" with sets of review IDS and  count.
         top_k (int, optional): The number of top entities to include in the plot. Defaults to 10.
         save_path (str, optional): File path where the plot image will be saved. Defaults to './entity_frequency.png'.
     
@@ -23,9 +24,9 @@ def plot_entity_frequency(report: Dict,
         None
     """
     entity_counts = {
-        entity: details["positive_reviews"]["count"] +
-        details["negative_reviews"]["count"]
-        for entity, details in report.items()
+        entity: sentiment_map.positive_reviews.count +
+        sentiment_map.negative_reviews.count
+        for entity, sentiment_map in report.items()
     }
     sorted_entities = sorted(entity_counts.items(),
                              key=lambda x: x[1],
@@ -56,15 +57,14 @@ def plot_entity_frequency(report: Dict,
 # Review length vs Entities extracted
 def plot_review_length_vs_entities_violin(
         reviews: List[str],
-        report: Dict,
+        report: pydantic_models.AggregatedResults,
         save_path: str = "./review_length_vs_entities_violin.png") -> None:
-    """
-    Generates and saves a violin plot showcasing the relationship between review length and number of entities extracted.
+    """Generates and saves a violin plot showcasing the relationship between review length and number of entities extracted.
 
     Args:
         reviews (List[str]): List of reviews.
-        report (Dict): A dictionary where each key is an entity and the value is a dictionary with 
-        "positive_reviews" and "negative_reviews" as keys mapping to lists of review IDs.
+        report (AggregatedResults): A Pydantic object where each key is an entity, and the value is
+            an EntitySentimentMap containing "positive_reviews" and "negative_reviews" with sets of review IDS and  count.
         save_path (str, optional): File path where the plot image will be saved. Defaults to './review_length_vs_entities_violin.png'.
     
     Returns:
@@ -74,9 +74,9 @@ def plot_review_length_vs_entities_violin(
     entity_counts = []
     zero_count = 0
     for review_id in range(len(reviews)):
-        count = sum(review_id in entity_data["positive_reviews"]["ids"] or
-                    review_id in entity_data["negative_reviews"]["ids"]
-                    for entity_data in report.values())
+        count = sum(review_id in sentiment_map.positive_reviews.ids or
+                    review_id in sentiment_map.negative_reviews.ids
+                    for sentiment_map in report.values())
         entity_counts.append(count)
         if count == 0:
             zero_count += 1
@@ -106,14 +106,13 @@ def plot_review_length_vs_entities_violin(
 
 
 # Sentiment Intensity Heatmap
-def plot_sentiment_heatmap(report: Dict,
+def plot_sentiment_heatmap(report: pydantic_models.AggregatedResults,
                            save_path: str = "./sentiment_heatmap.png") -> None:
-    """
-    Generates and saves a heatmap visualizing the distribution of positive and negative review counts for each extracted entity.
+    """Generates and saves a heatmap visualizing the distribution of positive and negative review counts for each extracted entity.
 
     Args:
-        report (Dict): A dictionary where each key is an entity and the value is a dictionary containing 
-            "positive_reviews" and "negative_reviews" lists with review IDs.
+        report (AggregatedResults): A Pydantic object where each key is an entity, and the value is
+            an EntitySentimentMap containing "positive_reviews" and "negative_reviews" with sets of review IDS and  count and their counts.
             
         save_path (str, optional): File path where the heatmap image will be saved. Defaults to './sentiment_heatmap.png'.
 
@@ -123,9 +122,9 @@ def plot_sentiment_heatmap(report: Dict,
     entity_names = []
     sentiment_scores = []
 
-    for entity, details in report.items():
-        pos_count = details["positive_reviews"]["count"]
-        neg_count = details["negative_reviews"]["count"]
+    for entity, sentiment_map in report.items():
+        pos_count = sentiment_map.positive_reviews.count
+        neg_count = sentiment_map.negative_reviews.count
         sentiment_intensity = (pos_count - neg_count) / max(
             (pos_count + neg_count), 1)  # Normalized score
         entity_names.append(entity)
@@ -175,16 +174,15 @@ def plot_sentiment_heatmap(report: Dict,
 
 def plot_sentiment_trend(entity_name: str,
                          data_df: pd.DataFrame,
-                         report: Dict,
+                         report: pydantic_models.AggregatedResults,
                          save_path: str = "./trend.png",
                          time_interval: str = "D") -> None:
-    """
-    Generates and saves a plots displaying the trend of sentiments over time for a given entity.
+    """Generates and saves a plots displaying the trend of sentiments over time for a given entity.
 
     Args:
         entity_name (str): The entity to visualize (e.g., "Notifications").
-        report (Dict): A dictionary where each key is an entity and the value is a dictionary with 
-        "positive_reviews" and "negative_reviews" as keys mapping to lists of review IDs.
+        report (AggregatedResults): A Pydantic object where each key is an entity, and the value is
+            an EntitySentimentMap containing "positive_reviews" and "negative_reviews" with sets of review IDS and  count.
         data_df (pd.DataFrame): DataFrame containing "Time_submitted" and review IDs.
         save_path (str, optional): File path where the heatmap image will be saved. Defaults to './trend.png'.
         time_interval(str, optional): Time aggregation interval ("D" for daily, "W" for weekly).
@@ -197,9 +195,9 @@ def plot_sentiment_trend(entity_name: str,
     data_df["Time_submitted"] = pd.to_datetime(data_df["Time_submitted"])
 
     # Extract sentiment review IDs from JSON
-    entity_data = report.get(entity_name, {})
-    pos_reviews = entity_data.get("positive_reviews", {}).get("ids", [])
-    neg_reviews = entity_data.get("negative_reviews", {}).get("ids", [])
+    sentiment_map = report[entity_name]
+    pos_reviews = sentiment_map.positive_reviews.ids
+    neg_reviews = sentiment_map.negative_reviews.ids
 
     # Filter dataframe for matching review IDs
     df_pos = data_df[data_df.index.isin(pos_reviews)].copy(

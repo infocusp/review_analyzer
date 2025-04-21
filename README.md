@@ -24,7 +24,7 @@ Step 2: Install dependencies:
 ```bash
 pip install -r requirements.txt
 ```
-step 3: Configure API Key for LLM:
+Step 3: Configure API Key for LLM:
 - create a `.env` file in the project root directory
 - write to file: GOOGLE_API_KEY = "your api key"
 
@@ -32,17 +32,15 @@ step 3: Configure API Key for LLM:
 # Run Analysis
 
 ```bash
-cd src
-python Analyzer.py
+python -m src/analyzer.py
 ```
 
 # Launch Web-App
 ```bash
-cd app
-python streamlit run Home.py
+PYTHONPATH=. streamlit run app/home.py
 ```
 # Customization
 The current system is optimized for **Spotify user reviews**. If you want to analyse reviews for some other product or service, you need to:
 
-- Modify the few-shot examples in `src/few_shot_examples` and the system prompt in `prompyts.py`.
+- Modify the few-shot examples in `src/few_shot_examples` and the system prompt in `prompts.py`.
 - Make sure the data format alligns with the current one, for eg: column names in csv file.\

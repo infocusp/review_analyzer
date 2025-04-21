@@ -1,12 +1,13 @@
+import json
 import os
-import sys
 import time
 
 import streamlit as st
 
-sys.path.append("..")
 from utils import analyzer_utils
+from utils import constants
 from utils import plotting_utils
+from utils import pydantic_models
 
 # Page Title
 st.title("📊 Evaluation & Quality Assessment")
@@ -17,24 +18,22 @@ tab1, tab2, tab3 = st.tabs([
     "🧑🏾‍💻 Manual Verification"
 ])
 
-plot_dir = "./static/plots"  # All plots needs to placed here
+plot_dir = constants.plot_dir
 os.makedirs(plot_dir, exist_ok=True)
 
 plot_files = {
     "Review Length vs. Number of Entities":
-        "review_length_vs_entities_violin.png",
-    "Coverage Analysis":
-        "coverage_analysis.png",
+        "review_length_vs_entities_violin.png"
 }
 
 # Load Data and report
-json_report_path = "./static/Analysis_report.json"
-report = analyzer_utils.load_analysis_report(json_report_path)
+with open(constants.analysis_report_path, "r") as f:
+    raw = json.load(f)
+    report = pydantic_models.AggregatedResults.parse_obj(raw)
 
-review_csv_path = "../data/spotify_reviews.csv"
-data = analyzer_utils.load_csv(review_csv_path,
-                               columns=["Time_submitted", "Review"],
-                               reviews_processed=34050)
+data = analyzer_utils.load_csv(file_path=constants.data_csv_path,
+                               columns=constants.features_to_use,
+                               reviews_processed=constants.reviews_processed)
 
 reviews = data["Review"].dropna().to_list()
 

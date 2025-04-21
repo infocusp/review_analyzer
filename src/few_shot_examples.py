@@ -1,11 +1,11 @@
-from langchain_core.prompts import PromptTemplate
+from langchain_core import prompts
 
 # Few-shot examples - specific to spotify app
 spotify_examples = [
     [
         # Batch 1: Mixed cases (positive, negative, synonyms, same entity across reviews)
         ("human",
-         PromptTemplate.from_template(
+         prompts.PromptTemplate.from_template(
              """Extract entities and sentiment from these reviews:
         review-101: The sound quality is fantastic! Love how crisp it is.
         review-102: The shuffle feature is completely useless.
@@ -20,7 +20,7 @@ spotify_examples = [
     [
         # Batch 2: Standardization of synonyms + implicit sentiment
         ("human",
-         PromptTemplate.from_template(
+         prompts.PromptTemplate.from_template(
              """Extract entities and sentiment from these reviews:
         review-201: The app experience is smooth and intuitive.
         review-202: Navigating through the UI is frustrating, too many unnecessary steps.Worst app ever.
@@ -35,7 +35,7 @@ spotify_examples = [
     [
         # Batch 3: Mixed sentiment on the same entity
         ("human",
-         PromptTemplate.from_template(
+         prompts.PromptTemplate.from_template(
              """Extract entities and sentiment from these reviews:
         review-301: The music selection is fantastic, but the ads are too frequent.
         review-302: Love the app, but way too many ads.
@@ -50,7 +50,7 @@ spotify_examples = [
     [
         # Batch 4: Handling ambiguous sentiment and comparisons
         ("human",
-         PromptTemplate.from_template(
+         prompts.PromptTemplate.from_template(
              """Extract entities and sentiment from these reviews:
         review-401: The app is slightly better now, but the shuffle feature is still useless.
         review-402: Not bad, but I still expected more.
@@ -65,7 +65,7 @@ spotify_examples = [
     [
         # Batch 5: Feature requests and implicit criticism
         ("human",
-         PromptTemplate.from_template(
+         prompts.PromptTemplate.from_template(
              """Extract entities and sentiment from these reviews:
         review-501: Would be great if we had a dark mode option.
         review-502: Why is there still no offline lyrics support? Annoying!
@@ -85,7 +85,7 @@ generalized_examples = [
     [
         # Example 1: Tech Product Reviews
         ("human",
-         PromptTemplate.from_template(
+         prompts.PromptTemplate.from_template(
              """Extract entities and sentiment from these reviews:
         review-101: The battery life is incredible! Lasts all day without issues.
         review-102: The camera quality is disappointing, expected much better.
@@ -103,7 +103,7 @@ generalized_examples = [
     [
         # Example 2: Streaming Service Reviews
         ("human",
-         PromptTemplate.from_template(
+         prompts.PromptTemplate.from_template(
              """Extract entities and sentiment from these reviews:
         review-201: The video quality is amazing, even on slow internet.
         review-202: So many ads! It ruins the experience.
@@ -121,7 +121,7 @@ generalized_examples = [
     [
         # Example 3: E-Commerce Reviews
         ("human",
-         PromptTemplate.from_template(
+         prompts.PromptTemplate.from_template(
              """Extract entities and sentiment from these reviews:
         review-301: The delivery was super fast, received it in one day!
         review-302: The packaging was terrible, the product arrived damaged.
@@ -139,7 +139,7 @@ generalized_examples = [
     [
         # Example 4: Food Delivery App Reviews
         ("human",
-         PromptTemplate.from_template(
+         prompts.PromptTemplate.from_template(
              """Extract entities and sentiment from these reviews:
         review-401: The app is easy to use, very intuitive.
         review-402: My order arrived 30 minutes late, really frustrating!
@@ -157,7 +157,7 @@ generalized_examples = [
     [
         # Example 5: SaaS Software Reviews
         ("human",
-         PromptTemplate.from_template(
+         prompts.PromptTemplate.from_template(
              """Extract entities and sentiment from these reviews:
         review-501: The new update is really efficient, saves a lot of time. UI changes are on pint.
         review-502: The UI is confusing, takes too long to find basic features.

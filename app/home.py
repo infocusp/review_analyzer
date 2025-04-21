@@ -1,5 +1,7 @@
 import streamlit as st
 
+from utils import constants
+
 # set page config
 st.set_page_config(page_title="REVIEW ANALYZER", layout="wide")
 
@@ -21,7 +23,7 @@ st.markdown("""
         With traditional systems, such insight rich feedbacks are often burried beneath noise, contraditctions, and vague sentiments as they oversimplify the feedback, reducing entire reviews to a single label. 
 
         """)
-st.image("./static/review-level-sentiment.jpg")
+st.image(constants.review_level_analysis_img_path)
 st.markdown("*The Result?* Uncovered nuances and missed opportunities.")
 
 st.divider()
@@ -32,7 +34,7 @@ st.markdown("""
 
     Leveraging the power of LLMs, it break down reviews to indentify specific entities that are being discussed *(fuatures, artists, experiences etc)*, and analyze the sentiment around each one. 
     """)
-st.image("./static/entity-level-sentiment.png")
+st.image(constants.entity_level_analysis_img_path)
 st.markdown("*The Result?* Clear, focused and more informative insights.")
 st.markdown("""
     #### Key Features
@@ -47,11 +49,11 @@ st.divider()
 st.markdown(f"""
     ### **Stop guessing—start understanding!**
 
-    ### 🛠️ [Know How](/Acedemia)  👉 How It works & What powers it.
+    ### 🛠️ [Know How](/acedemia)  👉 How It works & What powers it.
 
-    ### 🧐 [Evaluation Portal](/Evaluation)  👉 Assessment and Validatation. 
+    ### 🧐 [Evaluation Portal](/evaluation)  👉 Assessment and Validatation. 
 
-    ### 📈 [The Final Takeaways](/Insights) 👉 Key Insights, Trends & Visual Reports. 
+    ### 📈 [The Final Takeaways](/insights) 👉 Key Insights, Trends & Visual Reports. 
 
     """,
             unsafe_allow_html=True)
