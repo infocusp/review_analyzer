@@ -32,7 +32,7 @@ Step 3: Configure API Key for LLM:
 # Run Analysis
 
 ```bash
-python -m src/analyzer.py
+python -m src.analyzer
 ```
 
 # Launch Web-App

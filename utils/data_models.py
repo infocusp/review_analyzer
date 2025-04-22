@@ -17,32 +17,28 @@ class Checkpoint(BaseModel):
     existing_entities: List[str] = []
 
 
-class EntityStats(BaseModel):
-    """Represents statistics for a sentiment category of an entity.
-
-    Attributes:
-        count (int): Total number of unique reviews in this sentiment category.
-        ids (Set[int]): Set of review IDs corresponding to this sentiment.
-    """
-    count: int
-    ids: Set[int]
-
-    class Config:
-        json_encoders = {
-            set: list  # Automatically convert sets to lists when saving
-        }
-
-
 class EntitySentimentMap(BaseModel):
     """Holds sentiment-wise review statistics for a single entity.
 
     Attributes:
-        positive_reviews (EntityStats): Statistics for positive sentiment.
-        negative_reviews (EntityStats): Statistics for negative sentiment.
+        positive_review_ids (Set[int]): Set of review IDs for positive sentiment.
+        negative_review_ids (Set[int]): Set of review IDs for negative sentiment.
+
+    Properties:
+        positive_count (int): The total number of positive reviews.
+        negative_count (int): The total number of negative reviews.
     """
 
-    positive_reviews: EntityStats
-    negative_reviews: EntityStats
+    positive_review_ids: Set[int]
+    negative_review_ids: Set[int]
+
+    @property
+    def positive_count(self) -> int:
+        return len(self.positive_review_ids)
+
+    @property
+    def negative_count(self) -> int:
+        return len(self.negative_review_ids)
 
     class Config:
         json_encoders = {set: list}

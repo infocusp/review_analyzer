@@ -6,8 +6,8 @@ import streamlit as st
 
 from utils import analyzer_utils
 from utils import constants
+from utils import data_models
 from utils import plotting_utils
-from utils import pydantic_models
 
 # Set page title
 st.title("📈 Insights & Reports")
@@ -40,7 +40,7 @@ plots = {
 # Load analysis report
 with open(constants.analysis_report_path, "r") as f:
     raw = json.load(f)
-    report = pydantic_models.AggregatedResults.parse_obj(raw)
+    report = data_models.AggregatedResults.model_validate(raw)
 
 data = analyzer_utils.load_csv(file_path=constants.data_csv_path,
                                columns=constants.features_to_use,
@@ -54,8 +54,8 @@ with tab1:
     # Convert dict to DataFrame
     df = pd.DataFrame([{
         "Entity": entity,
-        "Positive": sentiment_map.positive_reviews.count,
-        "Negative": sentiment_map.negative_reviews.count,
+        "Positive": sentiment_map.positive_count,
+        "Negative": sentiment_map.negative_count,
     } for entity, sentiment_map in report.items()])
     # Sort by entity name (alphabetical order)
     df = df.sort_values(by="Entity")

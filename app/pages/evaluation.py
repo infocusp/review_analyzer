@@ -6,8 +6,8 @@ import streamlit as st
 
 from utils import analyzer_utils
 from utils import constants
+from utils import data_models
 from utils import plotting_utils
-from utils import pydantic_models
 
 # Page Title
 st.title("📊 Evaluation & Quality Assessment")
@@ -29,7 +29,7 @@ plot_files = {
 # Load Data and report
 with open(constants.analysis_report_path, "r") as f:
     raw = json.load(f)
-    report = pydantic_models.AggregatedResults.parse_obj(raw)
+    report = data_models.AggregatedResults.model_validate(raw)
 
 data = analyzer_utils.load_csv(file_path=constants.data_csv_path,
                                columns=constants.features_to_use,

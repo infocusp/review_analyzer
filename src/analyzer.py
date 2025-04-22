@@ -12,7 +12,7 @@ import tqdm
 from src import prompts
 from utils import analyzer_utils
 from utils import constants
-from utils import pydantic_models
+from utils import data_models
 
 #Initialize logger
 Mylogger = analyzer_utils.Logger("Review Analyzer")
@@ -37,9 +37,6 @@ class ReviewAnalyzer:
         # Initialize Gemini model
         self.llm = langchain_google_genai.ChatGoogleGenerativeAI(
             model=constants.model)
-        # Memory to track previously extracted entities
-        self.memory = memory.ConversationBufferMemory(memory_key="entities",
-                                                      return_messages=True)
         self.ckpt_path = checkpoint_path
         self.result_path = report_path
 
@@ -47,12 +44,12 @@ class ReviewAnalyzer:
         if os.path.exists(self.ckpt_path):
             with open(self.ckpt_path, "r") as f:
                 raw = json.load(f)
-                self.previous_state = pydantic_models.Checkpoint.parse_obj(raw)
+                self.previous_state = data_models.Checkpoint.model_validate(raw)
         else:
             logger.warning(
                 f"Unable to find previous chackoint at {self.ckpt_path}, starting from scratch."
             )
-            self.previous_state = pydantic_models.Checkpoint()
+            self.previous_state = data_models.Checkpoint()
 
         # Load entities from previous state to memory
         if self.previous_state.existing_entities:
@@ -65,36 +62,13 @@ class ReviewAnalyzer:
         if os.path.exists(self.result_path):
             with open(self.result_path, "r") as f:
                 raw = json.load(f)
-                self.aggregated_results = pydantic_models.AggregatedResults.parse_obj(
+                self.aggregated_results = data_models.AggregatedResults.model_validate(
                     raw)
         else:
             logger.warning(
                 f"Could not find previous state for aggregated results at provided path : {self.result_path}, creating new report."
             )
-            self.aggregated_results = pydantic_models.AggregatedResults(data={})
-
-    def get_existing_entities(self, key: str) -> List[str]:
-        """Extract stored entities from memory.
-
-        Args:
-            key (str) : key under which the desired data is stored in memory.
-
-        Returns:
-            existing_entities (List[str]) : Stored entities
-        """
-
-        existing_entities = []
-        # Load existing memory
-        current_memory = self.memory.load_memory_variables({})
-        stored_messages = current_memory.get(key, [])
-
-        for msg in stored_messages:
-            if isinstance(msg, messages.AIMessage) and isinstance(
-                    msg.content, list):
-                # Extract stored entities from AIMessage
-                existing_entities = msg.content
-
-        return existing_entities
+            self.aggregated_results = data_models.AggregatedResults(data={})
 
     def format_reviews(self, reviews: List[str], batch_start_idx: int) -> str:
         """Formats the batch reviews in a single string.
@@ -114,8 +88,7 @@ class ReviewAnalyzer:
         return formatted_reviews
 
     def process_batch_output(self, model_response: Dict) -> Set[str]:
-        """Processes the model's response, updates the aggregated results, and maintains entity memory.
-
+        """Processes the model's response and updates the aggregated result.
         Args:
             model_response (Dict): The structured response from the model.
 
@@ -138,26 +111,14 @@ class ReviewAnalyzer:
             # Ensuring entity exists in aggregated_result
             if entity_name not in self.aggregated_results:
                 self.aggregated_results[
-                    entity_name] = pydantic_models.EntitySentimentMap(
-                        positive_reviews=pydantic_models.EntityStats(count=0,
-                                                                     ids=set()),
-                        negative_reviews=pydantic_models.EntityStats(count=0,
-                                                                     ids=set()),
-                    )
-
-            entity_sentiment_map = self.aggregated_results[entity_name]
+                    entity_name] = data_models.EntitySentimentMap(
+                        positive_review_ids=set(), negative_review_ids=set())
 
             # Update values with unique IDs
-            entity_sentiment_map.positive_reviews.ids.update(
+            self.aggregated_results[entity_name].positive_review_ids.update(
                 positive_review_ids)
-            entity_sentiment_map.negative_reviews.ids.update(
+            self.aggregated_results[entity_name].negative_review_ids.update(
                 negative_review_ids)
-
-            # Update counts based on unique IDs
-            entity_sentiment_map.positive_reviews.count = len(
-                entity_sentiment_map.positive_reviews.ids)
-            entity_sentiment_map.negative_reviews.count = len(
-                entity_sentiment_map.negative_reviews.ids)
 
             # Append to current batch entities
             batch_entities.add(entity_name)
@@ -175,7 +136,7 @@ class ReviewAnalyzer:
         """
 
         # Fetch existing entities from memory
-        existing_entities = self.get_existing_entities(key="entities")
+        existing_entities = self.previous_state.existing_entities
         entities_added = False
 
         # Add new entities (avoid duplication)
@@ -186,10 +147,6 @@ class ReviewAnalyzer:
                 entities_added = True
 
         if entities_added:
-            # Save updated memory
-            self.memory.clear()
-            self.memory.save_context({"input": "Updating entity memory"},
-                                     {"entities": existing_entities})
             logger.info("Memory updated".upper())
         else:
             logger.info(
@@ -200,7 +157,7 @@ class ReviewAnalyzer:
     def process_reviews_in_batches(
             self,
             reviews: List[str],
-            batch_size: int = 50) -> pydantic_models.AggregatedResults:
+            batch_size: int = 50) -> data_models.AggregatedResults:
         """Processes user reviews in batches, extracting entities and sentiment from each batch.
 
         Args:
@@ -257,13 +214,12 @@ class ReviewAnalyzer:
             formatted_reviews = self.format_reviews(
                 reviews=batch_reviews, batch_start_idx=batch_start_idx)
 
-            # fetch existing entities from memory
-            existing_entities = self.get_existing_entities(key="entities")
-
             # format the ChatPromptTemplate with system, user prompt
             formatted_prompt = prompts.chat_prompt_template.format(
-                system_prompt=prompts.get_system_propmt(existing_entities),
-                user_prompt=prompts.get_user_prompt(formatted_reviews))
+                system_prompt=prompts.get_system_propmt(
+                    existing_entities=checkpoint.existing_entities),
+                user_prompt=prompts.get_user_prompt(
+                    formatted_reviews=formatted_reviews))
 
             if batch_start_idx == 0:
                 print("=" * 100)
@@ -301,8 +257,6 @@ class ReviewAnalyzer:
 
             # Save checkpoint and aggregated results after every batch
             checkpoint.last_batch_idx = batch_start_idx
-            checkpoint.existing_entities = self.get_existing_entities(
-                key="entities")
             with open(self.ckpt_path, "w") as f:
                 f.write(checkpoint.model_dump_json(indent=4))
             with open(self.result_path, "w") as f:

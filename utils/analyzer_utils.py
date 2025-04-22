@@ -5,7 +5,7 @@ from typing import Dict, List
 import colorlog
 import pandas as pd
 
-from utils import pydantic_models
+from utils import data_models
 
 
 class Logger:
@@ -72,7 +72,7 @@ def load_csv(file_path: str,
 
 
 def analyze_coverage(data: pd.DataFrame,
-                     report: pydantic_models.AggregatedResults) -> Dict:
+                     report: data_models.AggregatedResults) -> Dict:
     """Extract coverage information from Analysis Report.
 
     args:
@@ -108,7 +108,7 @@ def analyze_coverage(data: pd.DataFrame,
 
 
 def get_reviews_for_entity(data: pd.DataFrame,
-                           report: pydantic_models.AggregatedResults,
+                           report: data_models.AggregatedResults,
                            entity_name: str,
                            sentiment: str = "positive") -> pd.DataFrame:
     """Fecthes reviews assigned to a particular entity-sentiment group.

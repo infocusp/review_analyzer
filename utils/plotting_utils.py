@@ -5,11 +5,11 @@ import numpy as np
 import pandas as pd
 import seaborn as sns
 
-from utils import pydantic_models
+from utils import data_models
 
 
 #  Entity Frequency (Top Entities)
-def plot_entity_frequency(report: pydantic_models.AggregatedResults,
+def plot_entity_frequency(report: data_models.AggregatedResults,
                           top_k: int = 10,
                           save_path: str = "./entity_frequency.png") -> None:
     """Generates and saves a bar plot of the most frequently mentioned entities in the review analysis report.
@@ -57,7 +57,7 @@ def plot_entity_frequency(report: pydantic_models.AggregatedResults,
 # Review length vs Entities extracted
 def plot_review_length_vs_entities_violin(
         reviews: List[str],
-        report: pydantic_models.AggregatedResults,
+        report: data_models.AggregatedResults,
         save_path: str = "./review_length_vs_entities_violin.png") -> None:
     """Generates and saves a violin plot showcasing the relationship between review length and number of entities extracted.
 
@@ -106,7 +106,7 @@ def plot_review_length_vs_entities_violin(
 
 
 # Sentiment Intensity Heatmap
-def plot_sentiment_heatmap(report: pydantic_models.AggregatedResults,
+def plot_sentiment_heatmap(report: data_models.AggregatedResults,
                            save_path: str = "./sentiment_heatmap.png") -> None:
     """Generates and saves a heatmap visualizing the distribution of positive and negative review counts for each extracted entity.
 
@@ -174,7 +174,7 @@ def plot_sentiment_heatmap(report: pydantic_models.AggregatedResults,
 
 def plot_sentiment_trend(entity_name: str,
                          data_df: pd.DataFrame,
-                         report: pydantic_models.AggregatedResults,
+                         report: data_models.AggregatedResults,
                          save_path: str = "./trend.png",
                          time_interval: str = "D") -> None:
     """Generates and saves a plots displaying the trend of sentiments over time for a given entity.
