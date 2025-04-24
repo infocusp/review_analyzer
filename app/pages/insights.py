@@ -1,3 +1,5 @@
+"""This file represents the `insights` page of the streamlit application"""
+
 import json
 import os
 
@@ -54,8 +56,8 @@ with tab1:
     # Convert dict to DataFrame
     df = pd.DataFrame([{
         "Entity": entity,
-        "Positive": sentiment_map.positive_count,
-        "Negative": sentiment_map.negative_count,
+        "Positive": len(sentiment_map["positive_review_ids"]),
+        "Negative": len(sentiment_map["negative_review_ids"]),
     } for entity, sentiment_map in report.items()])
     # Sort by entity name (alphabetical order)
     df = df.sort_values(by="Entity")

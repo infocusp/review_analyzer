@@ -1,9 +1,8 @@
 {
     "data" : {
         "Audio Quality": {
-            "positive_reviews": {
-                "count": 819,
-                "ids": [
+            "positive_review_ids": 
+                 [
                     0,
                     4096,
                     22529,
@@ -823,11 +822,8 @@
                     26611,
                     22523,
                     26622
-                ]
-            },
-            "negative_reviews": {
-                "count": 285,
-                "ids": [
+                ],
+            "negative_review_ids": [
                     20480,
                     28676,
                     30212,
@@ -1113,13 +1109,11 @@
                     27645,
                     20478,
                     29183
-                ]
-            }
+                
+            ]
         },
         "Spotify App": {
-            "positive_reviews": {
-                "count": 8381,
-                "ids": [
+            "positive_review_ids": [
                     32768,
                     1,
                     32769,
@@ -9501,11 +9495,9 @@
                     32743,
                     32764,
                     32767
-                ]
-            },
-            "negative_reviews": {
-                "count": 7231,
-                "ids": [
+                ],
+
+            "negative_review_ids": [
                     2,
                     3,
                     5,
@@ -16737,13 +16729,11 @@
                     32757,
                     32760,
                     32761
-                ]
-            }
+                
+            ]
         },
         "Ads": {
-            "positive_reviews": {
-                "count": 560,
-                "ids": [
+            "positive_review_ids": [
                     10240,
                     22529,
                     28675,
@@ -17304,11 +17294,9 @@
                     2040,
                     20473,
                     22524
-                ]
-            },
-            "negative_reviews": {
-                "count": 4006,
-                "ids": [
+                
+            ],
+            "negative_review_ids": [
                     24580,
                     24581,
                     9,
@@ -21315,13 +21303,11 @@
                     24564,
                     8188,
                     8190
-                ]
-            }
+                
+            ]
         },
         "Music Selection": {
-            "positive_reviews": {
-                "count": 3999,
-                "ids": [
+            "positive_review_ids": [
                     8194,
                     24579,
                     7,
@@ -25321,11 +25307,8 @@
                     24566,
                     32759,
                     32758
-                ]
-            },
-            "negative_reviews": {
-                "count": 904,
-                "ids": [
+                ],
+            "negative_review_ids": [
                     10242,
                     28674,
                     4,
@@ -26230,13 +26213,11 @@
                     18421,
                     26616,
                     28668
-                ]
-            }
+                
+            ]
         },
         "Lyrics Support": {
-            "positive_reviews": {
-                "count": 241,
-                "ids": [
+            "positive_review_ids": [
                     5633,
                     9729,
                     33281,
@@ -26478,11 +26459,9 @@
                     7157,
                     29687,
                     32763
-                ]
-            },
-            "negative_reviews": {
-                "count": 390,
-                "ids": [
+                
+            ],
+            "negative_review_ids": [
                     32770,
                     16389,
                     4117,
@@ -26873,13 +26852,10 @@
                     24547,
                     12268,
                     22523
-                ]
-            }
+            ]
         },
         "Offline Mode": {
-            "positive_reviews": {
-                "count": 209,
-                "ids": [
+            "positive_review_ids": [
                     8199,
                     10764,
                     10766,
@@ -27089,11 +27065,9 @@
                     25083,
                     10236,
                     3069
-                ]
-            },
-            "negative_reviews": {
-                "count": 664,
-                "ids": [
+
+            ],
+            "negative_review_ids": [
                     6144,
                     14341,
                     24582,
@@ -27758,23 +27732,17 @@
                     4089,
                     20476,
                     32766
-                ]
-            }
+            ]
         },
         "Dark Mode": {
-            "positive_reviews": {
-                "count": 5,
-                "ids": [
+            "positive_review_ids": [
                     14158,
                     19054,
                     28762,
                     7451,
                     11134
-                ]
-            },
-            "negative_reviews": {
-                "count": 11,
-                "ids": [
+                ],
+            "negative_review_ids": [
                     7398,
                     17899,
                     3278,
@@ -27787,12 +27755,10 @@
                     15581,
                     2590
                 ]
-            }
+
         },
         "Storage": {
-            "positive_reviews": {
-                "count": 8,
-                "ids": [
+            "positive_review_ids": [
                     17507,
                     29259,
                     5293,
@@ -27801,11 +27767,8 @@
                     26838,
                     21975,
                     8985
-                ]
-            },
-            "negative_reviews": {
-                "count": 100,
-                "ids": [
+            ],
+            "negative_review_ids": [
                     7,
                     3591,
                     15370,
@@ -27906,13 +27869,10 @@
                     17916,
                     12797,
                     27647
-                ]
-            }
+            ]
         },
         "Player Controls": {
-            "positive_reviews": {
-                "count": 53,
-                "ids": [
+            "positive_review_ids": [
                     5760,
                     19970,
                     30338,
@@ -27966,11 +27926,8 @@
                     17018,
                     2428,
                     33535
-                ]
-            },
-            "negative_reviews": {
-                "count": 1193,
-                "ids": [
+            ],
+            "negative_review_ids": [
                     22528,
                     28673,
                     12290,
@@ -29164,13 +29121,10 @@
                     28664,
                     18425,
                     12278
-                ]
-            }
+            ]
         },
         "Shuffle Feature": {
-            "positive_reviews": {
-                "count": 47,
-                "ids": [
+            "positive_review_ids": [
                     21893,
                     29192,
                     7177,
@@ -29218,11 +29172,8 @@
                     9595,
                     6908,
                     13949
-                ]
-            },
-            "negative_reviews": {
-                "count": 1138,
-                "ids": [
+            ],
+            "negative_review_ids": [
                     18434,
                     26626,
                     14339,
@@ -30361,20 +30312,14 @@
                     12280,
                     26617,
                     26619
-                ]
-            }
+            ]
         },
         "Account Login": {
-            "positive_reviews": {
-                "count": 2,
-                "ids": [
+            "positive_review_ids": [
                     7642,
                     7627
-                ]
-            },
-            "negative_reviews": {
-                "count": 265,
-                "ids": [
+            ],
+            "negative_review_ids": [
                     23040,
                     8197,
                     25102,
@@ -30640,13 +30585,10 @@
                     27129,
                     4090,
                     30206
-                ]
-            }
+            ]
         },
         "Playlist": {
-            "positive_reviews": {
-                "count": 1421,
-                "ids": [
+            "positive_review_ids": [
                     24577,
                     16389,
                     8213,
@@ -32068,11 +32010,8 @@
                     32748,
                     24558,
                     16371
-                ]
-            },
-            "negative_reviews": {
-                "count": 2127,
-                "ids": [
+            ],
+            "negative_review_ids": [
                     24578,
                     4,
                     24583,
@@ -34200,17 +34139,11 @@
                     16353,
                     24559,
                     24571
-                ]
-            }
+            ]
         },
         "Light Theme": {
-            "positive_reviews": {
-                "count": 0,
-                "ids": []
-            },
-            "negative_reviews": {
-                "count": 10,
-                "ids": [
+            "positive_review_ids": [],
+            "negative_review_ids": [
                     802,
                     23883,
                     3247,
@@ -34221,22 +34154,16 @@
                     22107,
                     23772,
                     29
-                ]
-            }
+            ]
         },
         "Videoke Feature": {
-            "positive_reviews": {
-                "count": 4,
-                "ids": [
+            "positive_review_ids": [
                     10897,
                     23738,
                     5186,
                     13950
-                ]
-            },
-            "negative_reviews": {
-                "count": 15,
-                "ids": [
+            ],
+            "negative_review_ids": [
                     3712,
                     18209,
                     28448,
@@ -34252,13 +34179,10 @@
                     4957,
                     1982,
                     9567
-                ]
-            }
+            ]
         },
         "Subscription Cost": {
-            "positive_reviews": {
-                "count": 501,
-                "ids": [
+            "positive_review_ids": [
                     10240,
                     6150,
                     2068,
@@ -34760,11 +34684,8 @@
                     8180,
                     22520,
                     22526
-                ]
-            },
-            "negative_reviews": {
-                "count": 1056,
-                "ids": [
+            ],
+            "negative_review_ids": [
                     22530,
                     26627,
                     18436,
@@ -35821,13 +35742,10 @@
                     24572,
                     8190,
                     28671
-                ]
-            }
+            ]
         },
         "Customer Support": {
-            "positive_reviews": {
-                "count": 50,
-                "ids": [
+            "positive_review_ids": [
                     0,
                     14976,
                     21507,
@@ -35878,11 +35796,8 @@
                     22643,
                     27770,
                     13948
-                ]
-            },
-            "negative_reviews": {
-                "count": 205,
-                "ids": [
+            ],
+            "negative_review_ids": [
                     18947,
                     30724,
                     23047,
@@ -36088,13 +36003,10 @@
                     22519,
                     18937,
                     8702
-                ]
-            }
+            ]
         },
         "Download Button": {
-            "positive_reviews": {
-                "count": 50,
-                "ids": [
+            "positive_review_ids": [
                     12545,
                     30214,
                     2442,
@@ -36145,11 +36057,8 @@
                     11636,
                     22260,
                     14327
-                ]
-            },
-            "negative_reviews": {
-                "count": 142,
-                "ids": [
+            ],
+            "negative_review_ids": [
                     25090,
                     14341,
                     7687,
@@ -36292,13 +36201,10 @@
                     2538,
                     3579,
                     20476
-                ]
-            }
+            ]
         },
         "UI": {
-            "positive_reviews": {
-                "count": 507,
-                "ids": [
+            "positive_review_ids": [
                     2048,
                     20481,
                     22531,
@@ -36806,11 +36712,8 @@
                     32752,
                     24562,
                     4094
-                ]
-            },
-            "negative_reviews": {
-                "count": 640,
-                "ids": [
+            ],
+            "negative_review_ids": [
                     30720,
                     4098,
                     2053,
@@ -37451,13 +37354,10 @@
                     22521,
                     20474,
                     30716
-                ]
-            }
+            ]
         },
         "Podcast": {
-            "positive_reviews": {
-                "count": 763,
-                "ids": [
+            "positive_review_ids": [
                     4097,
                     24577,
                     2051,
@@ -38221,11 +38121,8 @@
                     18426,
                     10237,
                     22527
-                ]
-            },
-            "negative_reviews": {
-                "count": 800,
-                "ids": [
+            ],
+            "negative_review_ids": [
                     32773,
                     8198,
                     14342,
@@ -39026,13 +38923,10 @@
                     18422,
                     16375,
                     28664
-                ]
-            }
+            ]
         },
         "Background Playback": {
-            "positive_reviews": {
-                "count": 76,
-                "ids": [
+            "positive_review_ids": [
                     20481,
                     22401,
                     13187,
@@ -39109,11 +39003,8 @@
                     30971,
                     14718,
                     33535
-                ]
-            },
-            "negative_reviews": {
-                "count": 118,
-                "ids": [
+            ],
+            "negative_review_ids": [
                     20480,
                     27656,
                     26125,
@@ -39232,23 +39123,17 @@
                     6647,
                     3580,
                     20478
-                ]
-            }
+            ]
         },
         "Bluetooth": {
-            "positive_reviews": {
-                "count": 5,
-                "ids": [
+            "positive_review_ids": [
                     32678,
                     31465,
                     30516,
                     27544,
                     31482
-                ]
-            },
-            "negative_reviews": {
-                "count": 176,
-                "ids": [
+            ],
+            "negative_review_ids": [
                     28163,
                     29191,
                     30218,
@@ -39425,8 +39310,7 @@
                     30205,
                     27134,
                     33279
-                ]
-            }
+            ]
         }
     }
 }

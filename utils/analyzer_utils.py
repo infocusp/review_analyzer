@@ -1,3 +1,6 @@
+"""This file contains a logger class and utility functions."""
+
+import json
 import logging
 import os
 from typing import Dict, List
@@ -78,7 +81,7 @@ def analyze_coverage(data: pd.DataFrame,
     args:
         data (pd.DataFrame): Dataframe containing all processed reviews
         report (AggregatedResults): A Pydantic object where each key is an entity, and the value is
-            an EntitySentimentMap containing "positive_reviews" and "negative_reviews" with sets of review IDS and  count.
+            a dictionary containing sets of review IDS corresponnding to each sentiment.
 
     Returns:
         coverage_report (Dict):
@@ -87,8 +90,8 @@ def analyze_coverage(data: pd.DataFrame,
     """
     entity_mentions = set()
     for entity, sentiment_map in report.items():
-        entity_mentions.update(sentiment_map.positive_reviews.ids)
-        entity_mentions.update(sentiment_map.negative_reviews.ids)
+        entity_mentions.update(sentiment_map["positive_review_ids"])
+        entity_mentions.update(sentiment_map["negative_review_ids"])
 
     reviews = pd.DataFrame(data["Review"])
 
@@ -116,15 +119,28 @@ def get_reviews_for_entity(data: pd.DataFrame,
     Args:
         data (pd.DataFrame): Dataframe containing all processed reviews
         report (AggregatedResults): A Pydantic object where each key is an entity, and the value is
-            an EntitySentimentMap containing "positive_reviews" and "negative_reviews" with sets of review IDS and  count.
+             a dictionary containing sets of review IDS corresponnding to each sentiment.
         entity_name (str): Name of entity to be queried
         sentiment (str): Sentiment to be queried
 
     Returns:
         selected_reviews(pd.DataFrame): DataFrame containing only Reviews assigned to given entity-sentiment group.
     """
-    sentiment += "_reviews"
-    review_ids = getattr(report[entity_name], sentiment).ids
+    review_ids = report[entity_name][f"{sentiment}_review_ids"]
     selected_reviews = data.iloc[sorted(review_ids)]["Review"]
     selected_reviews.index = range(1, len(selected_reviews) + 1)
     return selected_reviews
+
+
+def read_json(file_path: str) -> Dict:
+    """Loads json file to python dict.
+
+    Args:
+        file_path (str): path to json file.
+
+    Resturns:
+        data (Dict): python dict with loaded json data.
+    """
+    with open(file_path, "r") as f:
+        data = json.load(f)
+    return data

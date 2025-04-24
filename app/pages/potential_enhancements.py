@@ -1,3 +1,5 @@
+"""This file represents the `potential enhancement` page of the streamlit application"""
+
 import streamlit as st
 
 st.header("Potential Enhancements")

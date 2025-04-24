@@ -1,3 +1,5 @@
+"""This file represents the homepage of the streamlit application."""
+
 import streamlit as st
 
 from utils import constants

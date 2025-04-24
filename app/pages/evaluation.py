@@ -1,3 +1,5 @@
+"""This file represents the `evaluation` page of the streamlit application"""
+
 import json
 import os
 import time
@@ -27,9 +29,8 @@ plot_files = {
 }
 
 # Load Data and report
-with open(constants.analysis_report_path, "r") as f:
-    raw = json.load(f)
-    report = data_models.AggregatedResults.model_validate(raw)
+results = analyzer_utils.read_json(constants.analysis_report_path)
+report = data_models.AggregatedResults.model_validate(results)
 
 data = analyzer_utils.load_csv(file_path=constants.data_csv_path,
                                columns=constants.features_to_use,
@@ -44,7 +45,6 @@ with tab1:
         "Understanding how well our system assigns reviews to entities is crucial for evaluating its effectiveness. "
         "Here, we measure the **proportion of reviews for which at least one entity is extracted** to ensure comprehensive coverage."
     )
-
     coverage_report = analyzer_utils.analyze_coverage(data, report)
     # Display the Metric
     total_reviews = coverage_report["total_reviews"]

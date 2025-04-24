@@ -1,9 +1,13 @@
+"""This file contains prompt templates."""
+
 from typing import List, Tuple, Union
 
+from langchain import output_parsers
 from langchain.prompts import ChatPromptTemplate
 from langchain.prompts import PromptTemplate
 
 from src import few_shot_examples
+from utils import data_models
 
 
 def format_assistant_examples(
@@ -34,10 +38,8 @@ def format_assistant_examples(
     return assistant_examples
 
 
-def get_user_prompt(
-    formatted_reviews: str,
-    task_description: str = "Extract entities and sentiment from these reviews:"
-) -> str:
+def get_user_prompt(existing_entities: List[str],
+                    formatted_reviews: str) -> str:
     """Generates a structured user prompt using PromptTemplate.
 
     Args:
@@ -45,16 +47,20 @@ def get_user_prompt(
         task_description(str): Command to the model.
     
     Returns:
-      user prompt (str): A formatted user prompt.
+      user_prompt (str): A formatted user prompt.
     """
     user_prompt_template = PromptTemplate(
         input_variables=["task_description", "formatted_reviews"],
-        template="""
-        {task_description}
+        template=
+        """The following entities have been identified from previous reviews. 
+        Please refer to and reuse these entities wherever applicable to avoid creating duplicates:
+        {existing_entities} 
+
+        You are tasked with extracting entities/themes/topics and their corresponding sentiment from the new set of reviews:
         {formatted_reviews}
         """)
 
-    return user_prompt_template.format(task_description=task_description,
+    return user_prompt_template.format(existing_entities=existing_entities,
                                        formatted_reviews=formatted_reviews)
 
 
@@ -65,10 +71,13 @@ def get_system_propmt(existing_entities: List[str] = []) -> str:
         existing_entities(List[str]): List of extracted entities.
     
     Returns:
-      user prompt (str): A formatted system prompt.
+        system_prompt (str): A formatted system prompt.
     """
-
-    system_prompt = PromptTemplate(input_variables=["existing_entities"],
+    parser = output_parsers.PydanticOutputParser(
+        pydantic_object=data_models.AggregatedResults)
+    system_prompt = PromptTemplate(partial_variables={
+        "format_instructions": parser.get_format_instructions()
+    },
                                    template="""
             You are an AI assistant specializing in **extracting structured insights from Spotify user reviews**.
             Your goal is to **identify key entities, classify sentiment, and avoid redundant entity creation**.
@@ -78,15 +87,6 @@ def get_system_propmt(existing_entities: List[str] = []) -> str:
             - **Standardize names**: Group similar entities to avoid duplication.
             - **Assign sentiment**: Classify as `Positive` or `Negative`, ignoring neutral statements.
             - **Track occurrences**: Store review IDs under respective sentiment categories.
-
-            ### **Existing Entities Context**
-            Below are the entities identified so far across previous reviews.Reuse these entities whenever possible and do not create redundant entries.
-
-            {existing_entities}
-
-            ### **Response Format**
-            Return structured **JSON only**, without explanations or markdown.
-            If only "positive_reviews" are found for a particular entity, give empty list for "negative_reviews", vice versa.
         """)
 
     return system_prompt.format(existing_entities=existing_entities)

@@ -1,3 +1,5 @@
+"""This file contains utility functions for plotting."""
+
 from typing import Dict, List
 
 import matplotlib.pyplot as plt
@@ -16,7 +18,7 @@ def plot_entity_frequency(report: data_models.AggregatedResults,
 
     Args:
         report (AggregatedResults): A Pydantic object where each key is an entity, and the value is
-            an EntitySentimentMap containing "positive_reviews" and "negative_reviews" with sets of review IDS and  count.
+            a dictionary containing sets of review IDS corresponnding to each sentiment.
         top_k (int, optional): The number of top entities to include in the plot. Defaults to 10.
         save_path (str, optional): File path where the plot image will be saved. Defaults to './entity_frequency.png'.
     
@@ -24,8 +26,8 @@ def plot_entity_frequency(report: data_models.AggregatedResults,
         None
     """
     entity_counts = {
-        entity: sentiment_map.positive_reviews.count +
-        sentiment_map.negative_reviews.count
+        entity: len(sentiment_map["positive_review_ids"]) +
+        len(sentiment_map["negative_review_ids"])
         for entity, sentiment_map in report.items()
     }
     sorted_entities = sorted(entity_counts.items(),
@@ -64,7 +66,7 @@ def plot_review_length_vs_entities_violin(
     Args:
         reviews (List[str]): List of reviews.
         report (AggregatedResults): A Pydantic object where each key is an entity, and the value is
-            an EntitySentimentMap containing "positive_reviews" and "negative_reviews" with sets of review IDS and  count.
+            a dictionary containing sets of review IDS corresponnding to each sentiment.
         save_path (str, optional): File path where the plot image will be saved. Defaults to './review_length_vs_entities_violin.png'.
     
     Returns:
@@ -74,8 +76,8 @@ def plot_review_length_vs_entities_violin(
     entity_counts = []
     zero_count = 0
     for review_id in range(len(reviews)):
-        count = sum(review_id in sentiment_map.positive_reviews.ids or
-                    review_id in sentiment_map.negative_reviews.ids
+        count = sum(review_id in sentiment_map["positive_review_ids"] or
+                    review_id in sentiment_map["negative_review_ids"]
                     for sentiment_map in report.values())
         entity_counts.append(count)
         if count == 0:
@@ -112,7 +114,7 @@ def plot_sentiment_heatmap(report: data_models.AggregatedResults,
 
     Args:
         report (AggregatedResults): A Pydantic object where each key is an entity, and the value is
-            an EntitySentimentMap containing "positive_reviews" and "negative_reviews" with sets of review IDS and  count and their counts.
+           a dictionary containing sets of review IDS corresponnding to each sentiment.
             
         save_path (str, optional): File path where the heatmap image will be saved. Defaults to './sentiment_heatmap.png'.
 
@@ -123,8 +125,8 @@ def plot_sentiment_heatmap(report: data_models.AggregatedResults,
     sentiment_scores = []
 
     for entity, sentiment_map in report.items():
-        pos_count = sentiment_map.positive_reviews.count
-        neg_count = sentiment_map.negative_reviews.count
+        pos_count = len(sentiment_map["positive_review_ids"])
+        neg_count = len(sentiment_map["negative_review_ids"])
         sentiment_intensity = (pos_count - neg_count) / max(
             (pos_count + neg_count), 1)  # Normalized score
         entity_names.append(entity)
@@ -182,7 +184,7 @@ def plot_sentiment_trend(entity_name: str,
     Args:
         entity_name (str): The entity to visualize (e.g., "Notifications").
         report (AggregatedResults): A Pydantic object where each key is an entity, and the value is
-            an EntitySentimentMap containing "positive_reviews" and "negative_reviews" with sets of review IDS and  count.
+            a dictionary containing sets of review IDS corresponnding to each sentiment.
         data_df (pd.DataFrame): DataFrame containing "Time_submitted" and review IDs.
         save_path (str, optional): File path where the heatmap image will be saved. Defaults to './trend.png'.
         time_interval(str, optional): Time aggregation interval ("D" for daily, "W" for weekly).
@@ -196,14 +198,14 @@ def plot_sentiment_trend(entity_name: str,
 
     # Extract sentiment review IDs from JSON
     sentiment_map = report[entity_name]
-    pos_reviews = sentiment_map.positive_reviews.ids
-    neg_reviews = sentiment_map.negative_reviews.ids
+    pos_review_ids = sentiment_map["positive_review_ids"]
+    neg_review_ids = sentiment_map["negative_review_ids"]
 
     # Filter dataframe for matching review IDs
-    df_pos = data_df[data_df.index.isin(pos_reviews)].copy(
-    ) if pos_reviews else pd.DataFrame(columns=data_df.columns)
-    df_neg = data_df[data_df.index.isin(neg_reviews)].copy(
-    ) if neg_reviews else pd.DataFrame(columns=data_df.columns)
+    df_pos = data_df[data_df.index.isin(pos_review_ids)].copy(
+    ) if pos_review_ids else pd.DataFrame(columns=data_df.columns)
+    df_neg = data_df[data_df.index.isin(neg_review_ids)].copy(
+    ) if neg_review_ids else pd.DataFrame(columns=data_df.columns)
 
     # Group by time and count occurrences
     if not df_pos.empty:

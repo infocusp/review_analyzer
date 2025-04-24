@@ -1,3 +1,5 @@
+"""This file contains constant variables."""
+
 from typing import List
 
 # data_config
@@ -14,5 +16,4 @@ hld_img_path: str = "app/static/high_level_design.png"
 
 # analyzer_config
 model: str = "gemini-2.0-flash"
-ckpt_path: str = "src/checkpoint.json"
 aggregated_results_path: str = "src/aggregated_results.json"

@@ -1,3 +1,5 @@
+"""This file represents the `academia` page of the streamlit application"""
+
 import streamlit as st
 
 from utils import analyzer_utils
@@ -51,15 +53,6 @@ with tab3:
     - **Standardize names**: Group similar entities to avoid duplication.
     - **Assign sentiment**: Classify as `Positive` or `Negative`, ignoring neutral statements.
     - **Track occurrences**: Store review IDs under respective sentiment categories.
-
-    ### **Existing Entities Context**
-    Below are the entities identified so far across previous reviews.Reuse these entities 
-    whenever possible and do not create redundant entries.
-
-    {existing_entities}
-
-    ### **Response Format**
-    Return structured **JSON only**, without explanations or markdown.
     """,
             language="markdown")
 
@@ -80,8 +73,10 @@ with tab3:
         
         AI:
         {
-            "Audio Quality": {{"positive_reviews": [101, 103, 104], "negative_reviews": []}},
-            "Shuffle Feature": {{"positive_reviews": [], "negative_reviews": [102]}}
+            "entity_sentiment_map" : {
+                "Audio Quality": {{"positive_review_ids": [101, 103, 104], "negative_review_ids": []}},
+                "Shuffle Feature": {{"positive_review_ids": [], "negative_review_ids": [102]}}
+            }
         }
 
         #2. Standardization of synonyms + implicit sentiment
@@ -94,8 +89,10 @@ with tab3:
         
         AI:
         {
-            "Spotify App": {{"positive_reviews": [201], "negative_reviews": [202]}},
-            "UI": {{"positive_reviews": [203,204], "negative_reviews": [202]}}
+            "entity_sentiment_map" : {
+                "Spotify App": {{"positive_review_ids": [201], "negative_review_ids": [202]}},
+                "UI": {{"positive_review_ids": [203,204], "negative_review_ids": [202]}}
+            }
         }
 
         #3. Mixed sentiment on the same entity
@@ -108,8 +105,10 @@ with tab3:
         
         AI:
         {
-            "Music Selection": {{"positive_reviews": [301, 304], "negative_reviews": []}},
-            "Ads": {{"positive_reviews": [], "negative_reviews": [301, 302, 303]}}
+            "entity_sentiment_map" : {
+                "Music Selection": {{"positive_review_ids": [301, 304], "negative_review_ids": []}},
+                "Ads": {{"positive_review_ids": [], "negative_review_ids": [301, 302, 303]}}
+            }
         }
 
         #4. Handling ambiguous sentiment and comparisons
@@ -122,11 +121,26 @@ with tab3:
         
         AI:
         {
-            "Shuffle Feature": {{"positive_reviews": [], "negative_reviews": [401]}},
-            "Spotify App": {{"positive_reviews": [402, 403], "negative_reviews": [404]}}
+            "entity_sentiment_map" : {
+                "Shuffle Feature": {{"positive_review_ids": [], "negative_review_ids": [401]}},
+                "Spotify App": {{"positive_review_ids": [402, 403], "negative_review_ids": [404]}}
+            }
         }
-
         """,
+            language="markdown")
+
+    st.header("User Prompt")
+    st.write(
+        "The **user prompt** is the actual query made to the LLM. Here we provide existing entities and the reviews to be processed."
+    )
+    st.code("""
+    The following entities have been identified from previous reviews.
+    Please refer to and reuse these entities wherever applicable to avoid creating duplicates:
+    {existing_entities}
+            
+    You are tasked with extracting entities/themes/topics and their corresponding sentiment from the new set of reviews:
+    {formatted_reviews}
+    """,
             language="markdown")
 
 # Tab 4: Output Structure
@@ -139,12 +153,12 @@ with tab4:
     st.code("""
         {
             "Entity_1": {
-                "positive_reviews": [review_id_1, review_id_2, ...],
-                "negative_reviews": [review_id_3, review_id_4, ...]
+                "positive_review_ids": [review_id_1, review_id_2, ...],
+                "negative_review_ids": [review_id_3, review_id_4, ...]
             },
             "Entity_2": {
-                "positive_reviews": [review_id_5, review_id_6, ...],
-                "negative_reviews": [review_id_7, review_id_8, ...]
+                "positive_review_ids": [review_id_5, review_id_6, ...],
+                "negative_review_ids": [review_id_7, review_id_8, ...]
             }
         }
         """,
