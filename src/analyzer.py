@@ -25,7 +25,7 @@ load_dotenv()
 class ReviewAnalyzer:
     """Class to analyze user reviews using LLM."""
 
-    def __init__(self, report_path: str = "Analysis_report.json"):
+    def __init__(self, report_path: str = "analysis_report.json"):
         """ReviewAnalyzer parameters initialization.
 
         Args:

@@ -36,6 +36,7 @@ python -m src.analyzer
 ```
 
 # Launch Web-App
+It transforms raw customer reviews into structured insights.Beyond visual reports, it includes sections for evaluation and the underlying academic design of the solution.
 ```bash
 PYTHONPATH=. streamlit run app/home.py
 ```

@@ -16,4 +16,4 @@ hld_img_path: str = "app/static/high_level_design.png"
 
 # analyzer_config
 model: str = "gemini-2.0-flash"
-aggregated_results_path: str = "src/aggregated_results.json"
+aggregated_results_path: str = "src/analysis_report.json"
