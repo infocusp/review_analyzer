@@ -1,0 +1,9 @@
+#virtual env
+*_venv/
+
+#data
+data/
+
+#pychahe
+*.pyc
+__pycache__/

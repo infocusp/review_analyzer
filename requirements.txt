@@ -1,0 +1,29 @@
+# Langchain Core
+langchain==0.3.20
+langchain-core==0.3.41
+
+# Google Gemini (PaLM) Integration
+langchain-google-genai==2.0.10
+google-generativeai==0.8.4
+
+# Environment Variable MAnagement
+python-dotenv
+
+# ML utilities
+numpy==2.2.3
+pandas==2.2.3
+scikit-learn==1.6.1
+matplotlib==3.10.1
+seaborn==0.13.2
+
+#Logger
+colorlog==6.9.0
+
+#App
+streamlit==1.44.0
+
+#utils
+tqdm
+
+#workflow
+flake8
