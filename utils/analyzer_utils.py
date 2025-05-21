@@ -8,6 +8,7 @@ from typing import Dict, List
 import colorlog
 import pandas as pd
 
+from utils import constants
 from utils import data_models
 
 
@@ -71,6 +72,8 @@ def load_csv(file_path: str,
         kwargs['usecols'] = columns
 
     df = pd.read_csv(file_path, **kwargs)
+    df = df.dropna()
+    df.index = range(0, len(df))
     return df
 
 
@@ -100,11 +103,10 @@ def analyze_coverage(data: pd.DataFrame,
         all_review_ids.difference(entity_mentions))
 
     reviews_with_no_entities = reviews.iloc[reviews_ids_with_no_entities]
-    reviews_with_no_entities.index = range(1, len(reviews_with_no_entities) + 1)
 
     coverage_report = {
         "total_reviews": len(all_review_ids),
-        "unattended_reviews": reviews_with_no_entities
+        "unattended_reviews": reviews_with_no_entities.sort_index()
     }
 
     return coverage_report
@@ -128,8 +130,7 @@ def get_reviews_for_entity(data: pd.DataFrame,
     """
     review_ids = report[entity_name][f"{sentiment}_review_ids"]
     selected_reviews = data.iloc[sorted(review_ids)]["Review"]
-    selected_reviews.index = range(1, len(selected_reviews) + 1)
-    return selected_reviews
+    return selected_reviews.sort_index()
 
 
 def read_json(file_path: str) -> Dict:
@@ -144,3 +145,14 @@ def read_json(file_path: str) -> Dict:
     with open(file_path, "r") as f:
         data = json.load(f)
     return data
+
+
+def dump_batch_log(batch_idx: int, llm_input: str, llm_output: str) -> None:
+    debug_data = {
+        "query": llm_input,
+        "response": llm_output,
+    }
+    batch_log_path = os.path.join(constants.debug_dir,
+                                  f"batch_{batch_idx}.json")
+    with open(batch_log_path, "w") as f:
+        json.dump(debug_data, f, indent=4)

@@ -42,7 +42,7 @@ def plot_entity_frequency(report: data_models.AggregatedResults,
 
     # Annotate bars with values
     for index, value in enumerate(x):
-        ax.text(value + 50,
+        ax.text(value + 1,
                 index,
                 str(value),
                 va='center',
