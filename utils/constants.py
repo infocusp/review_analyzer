@@ -12,7 +12,7 @@ data = {
     "restaurant": "data/SemEval/restaurants_train.csv"
 }
 # data_config
-dataset_name: str = "spotify"
+dataset_name: str = "laptop"
 data_csv_path: str = data[dataset_name]
 features_to_use: List[str] = ["Review"]
 result_dir: str = "results/"

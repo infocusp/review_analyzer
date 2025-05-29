@@ -3,7 +3,7 @@
 from typing import List, Tuple, Union
 
 from langchain import output_parsers
-from langchain import prompts as prompts
+from langchain import prompts
 
 from src import few_shot_examples
 from utils import data_models

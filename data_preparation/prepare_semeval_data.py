@@ -1,4 +1,4 @@
-"""This file prepares SemEval datasets."""
+"""This file processes the SemEval-2014(ABSA) dataset by merging multiple aspect-polarity pairs per review into single entries, consolidating all aspects and their sentiments into one record per review."""
 
 import argparse
 import collections
@@ -14,11 +14,15 @@ logger = Mylogger.get_logger()
 
 def prepare_data(data_df: pd.DataFrame) -> pd.DataFrame:
     """Prepare SemEval dataset.
+
+    In the original format, each aspect-polarity pair for a review appears as a separate row.
+    This function groups all entries by review and creates a new column `Aspects` that contains 
+    a list of dictionaries with aspect-polarity pairs.
     
-    args:
+    Args:
         data_df (pd.DataFrame) : Dataframe containing raw data.
-    returns:
-        prepared_data_df (pd.DataFrame) : Dataframe containing prepared data.
+    Returns:
+        prepared_data_df (pd.DataFrame) : Transformed DataFrame with one row per review and an aggregated `Aspects` column.
     """
     grouped = collections.defaultdict(list)
 
@@ -43,7 +47,9 @@ def prepare_data(data_df: pd.DataFrame) -> pd.DataFrame:
     return prepared_data_df
 
 
-if __name__ == "__main__":
+def main():
+    """Parses command-line arguments, processes raw data, and saves the prepared output."""
+
     parser = argparse.ArgumentParser(
         description="Prepare SemEval dataset for ReviewAnalyzer")
     parser.add_argument("--file_path",
@@ -57,7 +63,7 @@ if __name__ == "__main__":
 
     args = parser.parse_args()
 
-    features_to_use = ["id", "Review", "aspect", "polarity", "from", "to"]
+    features_to_use = ["id", "Review", "aspect", "polarity"]
     if not os.path.exists(args.file_path):
         raise FileNotFoundError(
             f"Unable to load data, file not found at {args.file_path}")
@@ -70,3 +76,7 @@ if __name__ == "__main__":
 
     prepared_data.to_csv(args.save_path)
     logger.info(f"Prepared data saved to {args.save_path}")
+
+
+if __name__ == "__main__":
+    main()

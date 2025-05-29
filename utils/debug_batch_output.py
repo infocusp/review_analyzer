@@ -18,7 +18,8 @@ Mylogger = analyzer_utils.Logger("Review Analyzer")
 logger = Mylogger.get_logger()
 
 
-def debug_batch(file_path: str, llm) -> None:
+def debug_batch(file_path: str,
+                llm: langchain_google_genai.ChatGoogleGenerativeAI) -> None:
     """Debug a batch by loading input from saved log and the regenerating output.
 
     Args:
@@ -47,7 +48,7 @@ def debug_batch(file_path: str, llm) -> None:
             regenerated_output.content.strip("```json"))
     except Exception as e:
         logger.error(f"Error parsing generated output : {e}")
-
+        raise
     logger.info("\n🆕 Regenerated Output:")
     pprint.pprint(regenerated_output['entity_sentiment_map'])
     logger.info(
@@ -72,7 +73,7 @@ def main():
 
     llm = langchain_google_genai.ChatGoogleGenerativeAI(model=constants.model)
 
-    debug_batch(str(file_path), llm)
+    debug_batch(file_path, llm)
 
 
 if __name__ == "__main__":

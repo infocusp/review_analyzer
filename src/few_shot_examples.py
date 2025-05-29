@@ -202,7 +202,7 @@ generalized_examples = [
             "Mobile Application": {{"positive_review_ids": [307], "negative_review_ids": []}},
             "Transparency & Communication": {{"positive_review_ids": [], "negative_review_ids": [302]}},
             "General Statisfaction": {{"positive_review_ids": [], "negative_review_ids": [304,308]}},
-            "Check-in Process": {{"positive_review_ids": [], "negative_review_ids": [302, 308]}}
+            "Check-in Process": {{"positive_review_ids": [307], "negative_review_ids": [302, 308]}}
         }}""")
     ],
     [
@@ -231,7 +231,7 @@ generalized_examples = [
         }}""")
     ],
     [
-        # Batch 5: E-Commerce
+        # Batch 5: Online Marketplace
         ("human",
          prompts.PromptTemplate.from_template(
              """The following entities have been identified from previous reviews. 

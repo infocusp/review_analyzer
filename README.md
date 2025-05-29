@@ -29,15 +29,20 @@ Step 3: Configure API Key for LLM:
 - write to file: GOOGLE_API_KEY = "your api key"
 
 # Data Preparation
+We've used two datasets for review analysis:
+
+1. **Amazon Reviews Dataset :** This dataset provides large-scale, real-world customer reviews across various product categories. It allows us to analyze sentiment and key aspects from diverse and noisy review data at scale, making it ideal for general-purpose entity-level sentiment analysis.
+
+2. **ABSA (Aspect-Based Sentiment Analysis) Dataset from SemEval-2014 :** This dataset contains fine-grained sentiment annotations for multiple aspects per reviews for Laptops and Restaurants. It’s particularly useful for evaluating the system.
+
+
 ## Amazon-Reviews Data
 Follow the steps below to prepare Amazon review data for use in this project.
 
 ### step 1. Download the Data
 
 - Visit the dataset page:  
-  👉 [Amazon Reviews 2023 – McAuley Lab](https://huggingface.co/datasets/McAuley-Lab/Amazon-Reviews-2023)
-
-- Scroll to the **"Grouped by Category"** section.
+  👉 [Amazon Reviews 2023 – McAuley Lab | grouped-by-category](https://huggingface.co/datasets/McAuley-Lab/Amazon-Reviews-2023#grouped-by-category)
 
 - For your desired category (e.g., *Office_products*, *Electronics*), download both:
   - review
@@ -46,12 +51,24 @@ Follow the steps below to prepare Amazon review data for use in this project.
 ---
 
 ### step 2. Organize the Files
+After downloading the desired category-wise dataset as per step 1, you will get two files for the selected category
+(For eg: Fashion):
 
-Place the downloaded files in the following directory: `data/amazon_reviews/<category_name>`
+- A **review file** (e.g., `Fashion.jsonl`)
+- A **metadata file** (e.g., `meta_Fashion.jsonl`)
+
+Place both files in the following directory structure:
+```
+data/
+└── amazon_reviews/
+  └── fashion/                    <----   <category_name>
+    ├── Fashion.jsonl
+    └── meta_Fashion.jsonl
+```    
 
 ### step 3. Run the Preparation Script
 
-Use the following command to process the data:
+Once organized, use the following command to process the data:
 
 ```bash
 python -m data_preparation.prepare_amazon_data \
@@ -66,8 +83,11 @@ python -m data_preparation.prepare_amazon_data \
 --review_filename Amazon_Fashion.jsonl \
 --meta_filename meta_Amazon_Fashion.jsonl
 ```
+This will process the dataset by grouping reviews with the same parent_asin and save the top 20 product groups (based on number of reviews) as separate datasets.
 
 ## SemEval Data
+Follow the steps below to prepare SemEval-2014 data for use in this project.
+
 ### step 1. Download the Data
 
 - Download the data from provide link:  
@@ -75,7 +95,14 @@ python -m data_preparation.prepare_amazon_data \
 
 ### step 2. Organize the Files
 
-Place the downloaded files in the following directory: `data/semeval/`
+Extract the zip downloaded in step 1 and place the files in the following directory structure:
+```
+data/
+└── semeval/
+  ├── Laptop_Train_v2.csv
+  └── Restaurants_Train_v2.csv
+  └── ....
+```   
 
 ### step 3. Run the Preparation Script
 
@@ -92,7 +119,14 @@ python -m data_preparation.prepare_semeval_data \
 --file_path data/semeval/Restaurants_Train_v2.csv \
 --save_path data/semeval/prepared_restaurants_train.csv
 ```
+In the original dataset, each review is split across multiple rows, with each row representing a different aspect and its sentiment. During data preparation, these rows are merged into a single row per review to consolidate all aspect-sentiment pairs together. The prepared csv will include a new column `Aspects`, which contains a list of dictionaries like:
 
+```json
+[
+  {"aspect": "battery life", "polarity": "positive"},
+  {"aspect": "price", "polarity": "negative"}
+]
+```
 # Run Analysis
 
 ```bash
@@ -101,7 +135,7 @@ python -m src.analyzer
 **NOTE:** Logs and analysis report will be saved under `results\<dataset_name>\<experiment_name>`, as configured in `constants.py`.
 
 # Launch Web-App
-It transforms raw customer reviews into structured insights.Beyond visual reports, it includes sections for evaluation and the underlying academic design of the solution.
+It transforms raw customer reviews into structured insights. Beyond visual reports, it includes sections for evaluation and the underlying academic design of the solution.
 ```bash
 PYTHONPATH=. streamlit run app/home.py
 ```
@@ -109,7 +143,7 @@ PYTHONPATH=. streamlit run app/home.py
 The current system is optimized for **Spotify user reviews**. If you want to analyse reviews for some other product or service, you need to:
 
 - Modify the few-shot examples in `src/few_shot_examples` and the system prompt in `prompts.py`.
-- Make sure the data format alligns with the current one, for eg: column names in csv file.\
+- Make sure the data format alligns with the current one, for eg: column names in csv file.
 
 # Debugging
 If you'd like to debug the LLM output for a specific batch, you can use the debugging script to re-run the LLM on the same input and compare it with the previously saved output.

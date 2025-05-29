@@ -153,8 +153,10 @@ class ReviewAnalyzer:
                 except Exception as e:
                     logger.error(f"Validation Error: {e}")
 
+                batch_num = (batch_start_idx // batch_size) + 1
                 analyzer_utils.dump_batch_log(
-                    batch_idx=(batch_start_idx // batch_size) + 1,
+                    batch_log_path=os.path.join(constants.debug_dir,
+                                                f"batch_{batch_num}.json"),
                     llm_input=formatted_prompt,
                     llm_output=response.model_dump_json())
                 logger.info(
@@ -207,9 +209,10 @@ class ReviewAnalyzer:
 def main(csv_file):
 
     data = analyzer_utils.load_csv(
-        file_path=csv_file, reviews_processed=constants.reviews_processed)
+        file_path=csv_file,
+        columns=constants.features_to_use,
+        reviews_processed=constants.reviews_processed)
     analyzer = ReviewAnalyzer(report_path=constants.aggregated_results_path)
-
     analysis_report = analyzer.process_reviews_in_batches(
         data, batch_size=constants.batch_size)
 
