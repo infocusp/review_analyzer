@@ -26,10 +26,7 @@ with tab1:
 
 # Tab 2: Data Preview
 with tab2:
-    st.header("Sample Data Preview - Spotify Reviews")
-    st.write("""
-             Spotify is one of the largest music streaming service providers, with over 422 million monthly active users, including 182 million paying subscribers, as of March 2022. Some of them don't hesitate to share their experience using this application, expressing how satisfied or dissatisfied they are with the Application.
-        """)
+    st.header("Sample Data Preview")
     st.write("A glance at the customer reviews dataset before processing.")
 
     # Load Sample CSV and Display Preview
@@ -53,80 +50,10 @@ with tab3:
     - **Standardize names**: Group similar entities to avoid duplication.
     - **Assign sentiment**: Classify as `Positive` or `Negative`, ignoring neutral statements.
     - **Track occurrences**: Store review IDs under respective sentiment categories.
+
+    ### **Important Instructions**
+    - Focus on **meaning and implication** of the review sentence, not just keywords.
     """,
-            language="markdown")
-
-    st.header("Few-Shot Examples")
-    st.write(
-        "To ensure accurate and structured responses, carefully crafted few-shot examples are used that demonstrate exactly how the LLM should analyze and respond to reviews. These examples represent a diverse range of review styles -- positive, negative, mixed, vague, and detailed -- to help the model generalize across different tones and topics. By providing clear demonstration of entity extraction and sentiment labeling in a consistent format, we guide the model to produce outputs that are both reliable and easily feedable into downstream analysis"
-    )
-
-    # Display a few-shot example
-    st.code("""
-        #1. Mixed cases (positive, negative, synonyms, same entity across reviews)
-        Human: 
-        Extract entities and sentiment from these reviews:
-        review-101: The sound quality is fantastic! Love how crisp it is.
-        review-102: The shuffle feature is completely useless.
-        review-103: The audio is crystal clear, amazing clarity in music.
-        review-104: The sound system is top-notch, really enjoying it.
-        
-        AI:
-        {
-            "entity_sentiment_map" : {
-                "Audio Quality": {{"positive_review_ids": [101, 103, 104], "negative_review_ids": []}},
-                "Shuffle Feature": {{"positive_review_ids": [], "negative_review_ids": [102]}}
-            }
-        }
-
-        #2. Standardization of synonyms + implicit sentiment
-        Human: 
-        Extract entities and sentiment from these reviews:
-        review-201: The app experience is smooth and intuitive.
-        review-202: Navigating through the UI is frustrating, too many unnecessary steps.Worst app ever.
-        review-203: The interface is clean and easy to use.
-        review-204: The design and UX are just what I needed.
-        
-        AI:
-        {
-            "entity_sentiment_map" : {
-                "Spotify App": {{"positive_review_ids": [201], "negative_review_ids": [202]}},
-                "UI": {{"positive_review_ids": [203,204], "negative_review_ids": [202]}}
-            }
-        }
-
-        #3. Mixed sentiment on the same entity
-        Human: 
-        Extract entities and sentiment from these reviews:
-        review-301: The music selection is fantastic, but the ads are too frequent.
-        review-302: Love the app, but way too many ads.
-        review-303: The ads are ruining my experience.
-        review-304: They added new genres, which I really appreciate!
-        
-        AI:
-        {
-            "entity_sentiment_map" : {
-                "Music Selection": {{"positive_review_ids": [301, 304], "negative_review_ids": []}},
-                "Ads": {{"positive_review_ids": [], "negative_review_ids": [301, 302, 303]}}
-            }
-        }
-
-        #4. Handling ambiguous sentiment and comparisons
-        Human: 
-        Extract entities and sentiment from these reviews:
-        review-401: The app is slightly better now, but the shuffle feature is still useless.
-        review-402: Not bad, but I still expected more.
-        review-403: The latest update is much better than before!
-        review-404: The last version was way smoother than this update.
-        
-        AI:
-        {
-            "entity_sentiment_map" : {
-                "Shuffle Feature": {{"positive_review_ids": [], "negative_review_ids": [401]}},
-                "Spotify App": {{"positive_review_ids": [402, 403], "negative_review_ids": [404]}}
-            }
-        }
-        """,
             language="markdown")
 
     st.header("User Prompt")
@@ -137,10 +64,118 @@ with tab3:
     The following entities have been identified from previous reviews.
     Please refer to and reuse these entities wherever applicable to avoid creating duplicates:
     {existing_entities}
-            
+       
     You are tasked with extracting entities/themes/topics and their corresponding sentiment from the new set of reviews:
     {formatted_reviews}
     """,
+            language="markdown")
+
+    st.header("Few-Shot Examples")
+    st.write(
+        "To ensure accurate and structured responses, carefully crafted few-shot examples are used that demonstrate exactly how the LLM should analyze and respond to reviews. These examples represent a diverse range of review styles -- positive, negative, mixed, vague, and detailed -- to help the model generalize across different tones and topics. By providing clear demonstration of entity extraction and sentiment labeling in a consistent format, we guide the model to produce outputs that are both reliable and easily feedable into downstream analysis."
+    )
+
+    # Display a few-shot example
+    st.code("""
+        #1. Mixed cases (positive, negative, synonyms, same entity across reviews)
+        Human: 
+        The following entities have been identified from previous reviews.
+        Please refer to and reuse these entities wherever applicable to avoid creating duplicates:
+        [Seat Comfort, Baggage Handling, Food Quality]
+
+        You are tasked with extracting entities and their corresponding sentiment from the new set of reviews:
+        review-301: The airport lounge smelled like bleach and old cheese, wasted a credit card voucher.
+        review-302: Our 9-hour flight became 15 because of a missed connection. Not a single announcement, just mass confusion.
+        review-303: I'll never forget the gate agent who sprinted across the terminal to return my passport. Heroes wear hi-vis vests too.
+        review-304: Won't recommend this airline at all, only book if it's the only option left.
+        review-305: The business class seat reclined so far I thought I'd need a chiropractor — but honestly, I haven't slept that well in weeks.
+        review-306: The baggage claim at JFK is like a reverse lottery. You wait, pray, and still go home empty-handed. Mine came 2 days later smelling like diesel.
+        review-307: I loved the mobile app! Boarding passes, gate info, luggage tracking — everything worked without needing to talk to a single human. That's a win for me.
+        review-308: I travel often for work, and usually have my routine down to a science. But this time? From the start, things felt... off. The check-in process dragged—not because of a line, but because no one seemed to know how to handle a passport that wouldn't scan. I ended up being bounced between counters like a pinball. The flight was uneventful, which I normally appreciate, but somehow I left the plane feeling more drained than usual. Maybe it was the constant buzzing from the overhead bin or the stale air. What stuck with me most though was post-landing — standing alone at the carousel long after everyone else had left, realizing my bag wasn't coming. No apology from the staff, Just a form and a shrug.
+        
+        AI:
+        {
+            "entity_sentiment_map" : {
+                "Lounge": {"positive_review_ids": [], "negative_review_ids": [301]},
+                "Delay handling": {"positive_review_ids": [], "negative_review_ids": [302]},
+                "Hospitality": {"positive_review_ids": [303], "negative_review_ids": [302, 308]},
+                "Seat Comfort": {"positive_review_ids": [305], "negative_review_ids": []},
+                "Baggage Handling": {"positive_review_ids": [], "negative_review_ids": [306, 308]},
+                "Mobile Application": {"positive_review_ids": [307], "negative_review_ids": []},
+                "Transparency & Communication": {"positive_review_ids": [], "negative_review_ids": [302]},
+                "General Statisfaction": {"positive_review_ids": [], "negative_review_ids": [304,308]},
+                "Check-in Process": {"positive_review_ids": [], "negative_review_ids": [302, 308]}
+            }
+        }
+
+        #2. Standardization of synonyms + implicit sentiment
+        Human: 
+        The following entities have been identified from previous reviews. 
+        Please refer to and reuse these entities wherever applicable to avoid creating duplicates:
+        []
+
+        You are tasked with extracting entities and their corresponding sentiment from the new set of reviews:
+        review-901: Binge-watched the whole thing in two nights. Not because I loved it, but because I needed to know how that mess would end.
+        review-902: The lead actor carries the show on their back. Half the script is just them reacting silently and somehow it works.
+        review-903: Beautiful cinematography but someone explain to me how four characters survived that explosion completely unscathed?
+        review-904: Season one had magic. Season two has…flashbacks. So many flashbacks. I spent half the runtime trying to remember what happened in season one.
+        review-905: The plot got lost somewhere around episode four.
+        review-906: I cried. I laughed. I tweeted angrily at the writers. Isn't that what TV is supposed to do?
+        review-907: Could've ended two episodes sooner. Dragged.
+        
+        AI:
+        {
+            "entity_sentiment_map" : {
+            "Plot": {"positive_review_ids": [], "negative_review_ids": [901,903,905,907]},
+            "Lead Performance": {"positive_review_ids": [902], "negative_review_ids": []},
+            "Cinematography": {"positive_review_ids": [903], "negative_review_ids": []}
+            }
+        }
+
+        #3. Mixed sentiment on the same entity
+        Human: 
+        Please refer to and reuse these entities wherever applicable to avoid creating duplicates:
+        []
+
+        You are tasked with extracting entities and their corresponding sentiment from the new set of reviews:
+        review-301: The music selection is fantastic, but the ads are too frequent.
+        review-302: Love the app, but way too many ads.
+        review-303: The ads are ruining my experience.
+        review-304: They added new genres, which I really appreciate!
+        
+        AI:
+        {
+            "entity_sentiment_map" : {
+                "Music Selection": {"positive_review_ids": [301, 304], "negative_review_ids": []},
+                "Ads": {"positive_review_ids": [], "negative_review_ids": [301, 302, 303]}
+            }
+        }
+
+        #4. Handling ambiguous sentiment and comparisons
+        Human: 
+        The following entities have been identified from previous reviews.
+        Please refer to and reuse these entities wherever applicable to avoid creating duplicates:
+        [Food Quality, Ambiance, Hygiene Standards, Value for Money]
+
+        You are tasked with extracting entities and their corresponding sentiment from the new set of reviews:
+        review-401: The 45-minute wait for a table would've been tolerable if the famous melt-in-your-mouth short ribs weren't tougher than my work deadlines.
+        review-402: Our waiter disappeared after taking orders - had to flag down 3 different staff to get our check 90 minutes later.
+        review-403: Michelin-star presentation with McDonald's-level flavor. The $28 cocktail was the only memorable part.
+        review-404: Found a hair in my pasta.
+        review-405: Generous portions with authentic flavors! Noise levels were brutal though - had to shout across the table.
+        
+        AI:
+        {
+            "entity_sentiment_map" : {
+                "Food Quality": {"positive_review_ids": [405], "negative_review_ids": [401,403]},
+                "Service Speed": {"positive_review_ids": [], "negative_review_ids": [401,402]},
+                "Ambiance": {"positive_review_ids": [], "negative_review_ids": [405]},
+                "Portion Size": {"positive_review_ids": [405], "negative_review_ids": []},
+                "Hygiene Standards": {"positive_review_ids": [], "negative_review_ids": [404]},
+                "Value for Money": {"positive_review_ids": [], "negative_review_ids": [403]}
+            }
+        }
+        """,
             language="markdown")
 
 # Tab 4: Output Structure

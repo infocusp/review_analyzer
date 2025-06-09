@@ -3,11 +3,12 @@
 import json
 import os
 import time
-from typing import Dict, List, Set
+from typing import Dict, List, Set, Tuple
 
 from dotenv import load_dotenv
 from langchain import output_parsers
 import langchain_google_genai
+import pandas as pd
 import tqdm
 
 from src import prompts
@@ -52,31 +53,29 @@ class ReviewAnalyzer:
             self.aggregated_results = data_models.AggregatedResults(
                 entity_sentiment_map={})
 
-    def format_reviews(self, reviews: List[str], batch_start_idx: int) -> str:
+    def format_reviews(self, reviews: List[Tuple[int, str]]) -> str:
         """Formats the batch reviews in a single string.
 
         Args:
-            reviews (List[str]) : List of reviews (current batch)
+            reviews (List[Tuple[int, str]]) : List of reviews (current batch)
             batch_start_idx (int) : start index of the batch
 
         Returns:
             formatted_reviews (str) : Reviews formatted as a string
         """
 
-        formatted_reviews = "\n".join([
-            f"review-{batch_start_idx+id} : {review}"
-            for id, review in enumerate(reviews)
-        ])
+        formatted_reviews = "\n".join(
+            [f"review-{id} : {review}" for id, review in reviews])
         return formatted_reviews
 
     def process_reviews_in_batches(
             self,
-            reviews: List[str],
+            data: pd.DataFrame,
             batch_size: int = 50) -> data_models.AggregatedResults:
         """Processes user reviews in batches, extracting entities and sentiment from each batch.
 
         Args:
-            reviews (List[str]): A list of user reviews to be analyzed.
+            data (pd.DataFrame): Dataframe containing all processed reviews
             batch_size (int, optional): The number of reviews to process in a single batch. Default is 50.
 
         Returns:
@@ -91,12 +90,14 @@ class ReviewAnalyzer:
             - Aggregates extracted entities.
             - Save the checkpoint details and results after processing each batch.
         """
-
+        os.makedirs(constants.result_subdir, exist_ok=True)
+        os.makedirs(constants.debug_dir, exist_ok=True)
         if self.aggregated_results.batch_size is None:
             self.aggregated_results.batch_size = batch_size
         else:
             assert self.aggregated_results.batch_size == batch_size, f"batch size Mismatch, Checkpoint: {self.aggregated_results.batch_size}, Current: {batch_size}"
 
+        reviews = list(data["Review"].items())
         logger.info(
             f"Processing {len(reviews)} reviews in batches of {batch_size}...")
         print("=" * 100)
@@ -123,8 +124,7 @@ class ReviewAnalyzer:
                                     batch_size]
 
             # Format batch reviews in a string
-            formatted_reviews = self.format_reviews(
-                reviews=batch_reviews, batch_start_idx=batch_start_idx)
+            formatted_reviews = self.format_reviews(reviews=batch_reviews)
 
             existing_entities = self.aggregated_results.existing_entities
             # format the ChatPromptTemplate with system, user prompt
@@ -147,13 +147,18 @@ class ReviewAnalyzer:
                 t2 = time.perf_counter()
                 logger.info(
                     f"time taken to process the batch: {(t2-t1)*1000} ms")
-
                 try:
                     validated_response = data_models.AggregatedResults.model_validate(
                         response)
                 except Exception as e:
                     logger.error(f"Validation Error: {e}")
 
+                batch_num = (batch_start_idx // batch_size) + 1
+                analyzer_utils.dump_batch_log(
+                    batch_log_path=os.path.join(constants.debug_dir,
+                                                f"batch_{batch_num}.json"),
+                    llm_input=formatted_prompt,
+                    llm_output=response.model_dump_json())
                 logger.info(
                     f"ENTITIES EXTRACTED IN CURRENT BATCH : {list(validated_response.keys())}\n"
                 )
@@ -203,14 +208,14 @@ class ReviewAnalyzer:
 
 def main(csv_file):
 
-    data = analyzer_utils.load_csv(file_path=csv_file)
-    reviews = data["Review"].dropna().tolist()
-
+    data = analyzer_utils.load_csv(
+        file_path=csv_file,
+        columns=constants.features_to_use,
+        reviews_processed=constants.reviews_processed)
     analyzer = ReviewAnalyzer(report_path=constants.aggregated_results_path)
-
-    analysis_report = analyzer.process_reviews_in_batches(reviews,
-                                                          batch_size=50)
+    analysis_report = analyzer.process_reviews_in_batches(
+        data, batch_size=constants.batch_size)
 
 
 if __name__ == "__main__":
-    main("data/spotify_reviews.csv")
+    main(constants.data_csv_path)

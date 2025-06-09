@@ -24,6 +24,7 @@ streamlit==1.44.0
 
 #utils
 tqdm
+pydantic==2.10.6
 
 #workflow
-flake8
+pre-commit==4.2.0

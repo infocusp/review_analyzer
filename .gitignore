@@ -4,6 +4,9 @@
 #data
 data/
 
+#results
+results/
+
 #pychahe
 *.pyc
 __pycache__/

@@ -36,7 +36,7 @@ data = analyzer_utils.load_csv(file_path=constants.data_csv_path,
                                columns=constants.features_to_use,
                                reviews_processed=constants.reviews_processed)
 
-reviews = data["Review"].dropna().to_list()
+reviews = data["Review"].to_list()
 
 # Tab 1: Coverage Analysis
 with tab1:
@@ -101,12 +101,11 @@ with tab2:
 
     #  Display Selected Plot
     plot_path = os.path.join(plot_dir, "review_length_vs_entities_violin.png")
-    if not os.path.exists(plot_path):
-        # generate plot
-        plotting_utils.plot_review_length_vs_entities_violin(
-            reviews=data["Review"].dropna().to_list(),
-            report=report,
-            save_path=plot_path)
+
+    # generate plot
+    plotting_utils.plot_review_length_vs_entities_violin(reviews=reviews,
+                                                         report=report,
+                                                         save_path=plot_path)
     st.image(plot_path, use_container_width=True)
 
     st.markdown("""
@@ -121,16 +120,6 @@ with tab2:
 
         - Conversely, short reviews producing multiple entities could indicate over-extraction or noise in the LLM pipeline.
         """)
-
-    st.markdown("""
-        ### Entity Extraction Trends
-        - Across different review length bins, the median number of entities extracted remains relatively stable.
-
-        - Shorter reviews (less than 30 words) typically mention only 1-2 entities, which aligns with expectations since they contain fewer concepts.
-
-        - Longer reviews exhibit higher variance, sometimes mentioning up to 5-6 entities, indicating more detailed feedback.
-        """)
-
     st.markdown("""
         ### Future Anomaly Detection & Continuous Improvement
         - This plot can help track LLM performance over time to detect extraction inconsistencies.
