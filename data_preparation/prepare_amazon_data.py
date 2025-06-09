@@ -23,6 +23,7 @@ def jsonl_to_dataframe(file_path: str, chunk_size: int = 10000):
     Returns:
         (pd.DataFrame): dataframe consisting `chunk-size` of data.
     
+    Note: FileNotFound is handled by the calling function
     """
     data_chunk = []
     for i, line in enumerate(open(file_path, 'r')):
@@ -104,8 +105,8 @@ def main():
 
     args = parser.parse_args()
     data_dir = args.data_dir
-    data_filename = args.data_filename
-    metadata_filename = args.metadata_filename
+    data_filename = args.review_filename
+    metadata_filename = args.meta_filename
 
     # load review data
     logger.info("loading data")
