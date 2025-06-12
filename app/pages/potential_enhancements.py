@@ -30,9 +30,6 @@ st.markdown("""
     - After the final report is generated, a LLM call can be made to merge two entities if they are very similar.
     - This will act as a correction step wherein mistakes commited while assigning entities can be corrected.
     - For example: "Bugs", "Glitches" --> "Bugs"
-    
-    **Human Feedback Loop**
-    - Allow users to validate & correct extracted entities, improving accuracy over time.
     """)
 
 st.subheader("3. Advanced Features")

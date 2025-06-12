@@ -8,7 +8,6 @@ from typing import Dict, List
 import colorlog
 import pandas as pd
 
-from utils import constants
 from utils import data_models
 
 
@@ -74,6 +73,7 @@ def load_csv(file_path: str,
     df = pd.read_csv(file_path, **kwargs)
     df = df.dropna()
     df.index = range(0, len(df))
+    df.index = pd.Index(df.index, name="Review id")
     return df
 
 

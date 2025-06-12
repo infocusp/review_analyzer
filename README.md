@@ -5,6 +5,17 @@ Analyzes user reviews using LLM to identify the key entities being discussed alo
 
 Includes a web application which includes detailed explanation of how and why the solution works. Also, you can explore various interactive insights and analyze the user feedbacks efficiently and effectively.
 
+<p align="center">
+  <img src="img/report.png" width="45%" alt="Snapshot 1"/>
+  &nbsp; &nbsp;
+  <img src="img/freq_insights.png" width="46.5%" alt="Snapshot 2"/>
+</p>
+
+<p align="center">
+  <img src="img/manual_verification.png" width="46%" alt="Snapshot 1"/>
+  &nbsp; &nbsp;
+</p>
+
 # Key components
 The system is primarily driven by few-shot prompting, batch-processing and context chaining for better accuracy and efficiency.
 
@@ -32,16 +43,18 @@ Step 3: Configure API Key for LLM:
 
 We use three datasets for review analysis:
 
-1. **Spotify Review Data:**  
-   Contains user reviews for the Spotify app collected from the Google Play Store.
+1. **ABSA (Aspect-Based Sentiment Analysis) Dataset from SemEval-2014:**  
+   Contains fine-grained sentiment annotations for multiple aspects per review, covering Laptops and Restaurants.  
+   It’s particularly useful for evaluating the system’s accuracy in aspect-level sentiment detection.
 
 2. **Amazon Reviews Dataset:**  
    Provides large-scale, real-world customer reviews across various product categories.  
    It allows us to analyze sentiment and extract key aspects from diverse and noisy review data, making it ideal for general-purpose entity-level sentiment analysis.
 
-3. **ABSA (Aspect-Based Sentiment Analysis) Dataset from SemEval-2014:**  
-   Contains fine-grained sentiment annotations for multiple aspects per review, covering Laptops and Restaurants.  
-   It’s particularly useful for evaluating the system’s accuracy in aspect-level sentiment detection.
+3. **Spotify Review Data:**  
+   Contains user reviews for the Spotify app collected from the Google Play Store.
+
+
 
 ---
 
@@ -52,67 +65,6 @@ Each dataset should be a CSV file with a column named `"Review"`.
 Optionally, a column named `"Time_submitted"` can be included to store review timestamps (date or date-time).
 
 ---
-## Spotify Review Data
-
-### step 1. Download the Data
-- Download the data from provide link:  
-  👉 [spotify-app-reviews-2022](https://www.kaggle.com/datasets/mfaaris/spotify-app-reviews-2022)
-
-### step 2. Organize the Files
-2. Place it in the following directory:
-```
-data/
-└── spotify_reviews.csv
-```
-
-## Amazon-Reviews Data
-Follow the steps below to prepare Amazon review data for use in this project.
-
-### step 1. Download the Data
-
-- Visit the dataset page:  
-  👉 [Amazon Reviews 2023 – McAuley Lab | grouped-by-category](https://amazon-reviews-2023.github.io/#grouped-by-category)
-
-- For your desired category (e.g., *Office_products*, *Electronics*), download both:
-  - review
-  - meta
-
----
-
-### step 2. Organize the Files
-After downloading the desired category-wise dataset as per step 1, you will get two files(zip) for the selected category
-(For eg: Fashion):
-
-- A **review file** (e.g., `Fashion.jsonl`)
-- A **metadata file** (e.g., `meta_Fashion.jsonl`)
-
-Extract and place both files in the following directory structure:
-```
-data/
-└── amazon_reviews/
-  └── fashion/                    <----   <category_name>
-    ├── Fashion.jsonl
-    └── meta_Fashion.jsonl
-```    
-
-### step 3. Run the Preparation Script
-
-Once organized, use the following command to process the data:
-
-```bash
-python -m data_preparation.prepare_amazon_data \
---data_dir <path_to_dataset_dir> \
---review_filename <review_file_name> \
---meta_filename <meta_file_name>
-```
-**Example**
-```bash
-python -m data_preparation.prepare_amazon_data \
---data_dir data/amazon_reviews/fashion \
---review_filename Amazon_Fashion.jsonl \
---meta_filename meta_Amazon_Fashion.jsonl
-```
-This will process the dataset by grouping reviews with the same parent_asin and save the top 20 product groups (based on number of reviews) as separate datasets.
 
 ## SemEval Data
 Follow the steps below to prepare SemEval-2014 data for use in this project.
@@ -145,8 +97,8 @@ python -m data_preparation.prepare_semeval_data \
 **Example**
 ```bash
 python -m data_preparation.prepare_semeval_data \
---file_path data/semeval/Restaurants_Train_v2.csv \
---save_path data/semeval/prepared_restaurants_train.csv
+--file_path data/semeval/Laptop_Train_v2.csv \
+--save_path data/semeval/prepared_laptop_train.csv
 ```
 In the original dataset, each review is split across multiple rows, with each row representing a different aspect and its sentiment. During data preparation, these rows are merged into a single row per review to consolidate all aspect-sentiment pairs together. The prepared csv will include a new column `Aspects`, which contains a list of dictionaries like:
 
@@ -156,6 +108,76 @@ In the original dataset, each review is split across multiple rows, with each ro
   {"aspect": "price", "polarity": "negative"}
 ]
 ```
+
+<details>
+<summary><b>Spotify Review Data</b></summary>
+
+ #### step 1. Download the Data
+
+- Download the data from provide link:  
+  👉 [spotify-app-reviews-2022](https://www.kaggle.com/datasets/mfaaris/spotify-app-reviews-2022)
+
+ #### step 2. Organize the Files
+-  Place it in the following directory:
+```
+data/
+└── spotify_reviews.csv
+```
+</details>
+
+<details>
+<summary><b>Amazon-Reviews Data</b></summary>
+
+Follow the steps below to prepare Amazon review data for use in this project.
+
+#### step 1. Download the Data
+
+- Visit the dataset page:  
+  👉 [Amazon Reviews 2023 – McAuley Lab | grouped-by-category](https://amazon-reviews-2023.github.io/#grouped-by-category)
+
+- For your desired category (e.g., *Office_products*, *Electronics*), download both:
+  - review
+  - meta
+
+---
+
+#### step 2. Organize the Files
+After downloading the desired category-wise dataset as per step 1, you will get two files(zip) for the selected category
+(For eg: Fashion):
+
+- A **review file** (e.g., `Fashion.jsonl`)
+- A **metadata file** (e.g., `meta_Fashion.jsonl`)
+
+Extract and place both files in the following directory structure:
+```
+data/
+└── amazon_reviews/
+  └── fashion/                    <----   <category_name>
+    ├── Fashion.jsonl
+    └── meta_Fashion.jsonl
+```    
+
+#### step 3. Run the Preparation Script
+
+Once organized, use the following command to process the data:
+
+```bash
+python -m data_preparation.prepare_amazon_data \
+--data_dir <path_to_dataset_dir> \
+--review_filename <review_file_name> \
+--meta_filename <meta_file_name>
+```
+**Example**
+```bash
+python -m data_preparation.prepare_amazon_data \
+--data_dir data/amazon_reviews/fashion \
+--review_filename Amazon_Fashion.jsonl \
+--meta_filename meta_Amazon_Fashion.jsonl
+```
+This will process the dataset by grouping reviews with the same parent_asin and save the top 20 product groups (based on number of reviews) as separate datasets.
+</details>
+
+
 # Run the Analyzer
 
 ### Step 1: Configure Dataset & Experiment Name
@@ -202,7 +224,9 @@ Run the following command from project root:
 PYTHONPATH=. streamlit run app/home.py
 ```
 # Customization
-The current system is optimized for **Spotify user reviews**. If you want to analyse reviews for some other product or service, you need to:
+The current system is **dataset-agnostic** and can be applied to review data from any domain (apps, products, services, locations, etc.).
+
+To tailor the system to a specific use case:
 
 - Modify the few-shot examples in `src/few_shot_examples` and the system prompt in `prompts.py`.
 - Make sure the data format alligns with the current one, for eg: column names in csv file.
@@ -222,3 +246,9 @@ python -m utils.debug_batch_output --log_path results/<dataset_name>/<experiment
 ```bash
 python -m utils.debug_batch_output --log_path results/laptop/exp1/logs/batch_11.json
 ```
+
+# Results & Observations
+The system has been **qualitatively evaluated** across a range of datasets spanning different domains—products, services, and user experiences. The observed results have been highly encouraging as the entity extraction and sentiment tagging outputs have been consistently accurate and context-aware across domains.
+
+# Contributors
+Falak Shah, Tushar Gadhiya, Milind Padalkar and Yash Bohra.
