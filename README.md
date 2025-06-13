@@ -1,21 +1,40 @@
-# Review Analyzer - Extract Key themes/topics along with their sentiments
+# Review Analyzer: LLM-Powered Feedback Insights
 
-Analyzes user reviews using LLM to identify the key entities being discussed along with their sentiment (Positive or Negative) and generates meaningful insights. So basically it a combination of Named Entity Recognition and Sentiment Anlysis, performed at real time using the power of LLM.
+> Analyze user reviews using LLMs to extract entity-level sentiment, uncover key themes, and explore insights via a web interface.
 
+---
 
-Includes a web application which includes detailed explanation of how and why the solution works. Also, you can explore various interactive insights and analyze the user feedbacks efficiently and effectively.
+# 🔍 Overview
+
+This project uses **large language models (LLMs)** to analyze user reviews by extracting key **entities** (such as product features or services) and identifying the associated **sentiments** (positive or negative). It combines **named entity recognition (NER)** with **sentiment analysis** to generate structured, interpretable insights from raw textual feedback.
+
+The system includes two main components:
+
+- ## 🧠 Review Analyzer  
+  A backend module that processes batches of user reviews and generates a structured **JSON report**. Each entry captures the detected entities, their sentiment, and the associated review id.
+
+- ## 💻 Web Application  
+  An interactive frontend that loads and visualizes the JSON report. It provides:
+  - A static explanation of the methodology, such as a flowchart describing how the **LLM-based analysis** works
+  - Aggregate statistics and visual summaries across all reviews  
+  - Detailed insights into each review, including extracted entities and sentiment labels  
+
 
 <p align="center">
   <img src="img/report.png" width="45%" alt="Snapshot 1"/>
   &nbsp; &nbsp;
-  <img src="img/freq_insights.png" width="46.5%" alt="Snapshot 2"/>
+  <img src="img/manual_verification.png" width="45%" alt="Snapshot 1"/>
 </p>
 
 <p align="center">
-  <img src="img/manual_verification.png" width="46%" alt="Snapshot 1"/>
+  <img src="img/frequency_insights.png" width="45%" alt="Snapshot 2"/>
   &nbsp; &nbsp;
+  <img src="img/sentiment_insights.png" width="45.2%" alt="Snapshot 1"/>
 </p>
 
+---
+
+This setup is ideal for teams that want to analyze user feedback at scale with **LLM-powered precision** and explore the results through a clean, insightful interface.
 # Key components
 The system is primarily driven by few-shot prompting, batch-processing and context chaining for better accuracy and efficiency.
 
@@ -39,7 +58,7 @@ Step 3: Configure API Key for LLM:
 - create a `.env` file in the project root directory
 - write to file: GOOGLE_API_KEY = "your api key"
 
-# Datasets Used
+# Dataset
 
 We use three datasets for review analysis:
 
@@ -250,5 +269,15 @@ python -m utils.debug_batch_output --log_path results/laptop/exp1/logs/batch_11.
 # Results & Observations
 The system has been **qualitatively evaluated** across a range of datasets spanning different domains—products, services, and user experiences. The observed results have been highly encouraging as the entity extraction and sentiment tagging outputs have been consistently accurate and context-aware across domains.
 
-# Contributors
-Falak Shah, Tushar Gadhiya, Milind Padalkar and Yash Bohra.
+# Citation
+
+If you use this project in your work, please cite it as:
+
+```bibtex
+@misc{infocusp2025reviewanalyzer,
+  author       = {Falak Shah and Tushar Gadhiya and Milind Padalkar and Yash Bohra},
+  title        = {Review Analyzer: LLM-Powered Feedback Insights},
+  year         = {2025},
+  howpublished = {\url{https://github.com/infocusp/review_analyzer}},
+  note         = {Open-source project}
+}
