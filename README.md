@@ -2,7 +2,18 @@
 
 > Analyze user reviews using LLMs to extract entity-level sentiment, uncover key themes, and explore insights via a web interface.
 
----
+<p align="center">
+  <img src="img/report.png" width="45%" alt="Snapshot 1"/>
+  &nbsp; &nbsp;
+  <img src="img/manual_verification.png" width="45%" alt="Snapshot 1"/>
+</p>
+
+<p align="center">
+  <img src="img/frequency_insights.png" width="45%" alt="Snapshot 2"/>
+  &nbsp; &nbsp;
+  <img src="img/sentiment_insights.png" width="45.2%" alt="Snapshot 1"/>
+</p>
+
 
 # 🔍 Overview
 
@@ -19,29 +30,15 @@ The system includes two main components:
   - Aggregate statistics and visual summaries across all reviews  
   - Detailed insights into each review, including extracted entities and sentiment labels  
 
-
-<p align="center">
-  <img src="img/report.png" width="45%" alt="Snapshot 1"/>
-  &nbsp; &nbsp;
-  <img src="img/manual_verification.png" width="45%" alt="Snapshot 1"/>
-</p>
-
-<p align="center">
-  <img src="img/frequency_insights.png" width="45%" alt="Snapshot 2"/>
-  &nbsp; &nbsp;
-  <img src="img/sentiment_insights.png" width="45.2%" alt="Snapshot 1"/>
-</p>
-
----
-
 This setup is ideal for teams that want to analyze user feedback at scale with **LLM-powered precision** and explore the results through a clean, insightful interface.
+
 # Key components
 The system is primarily driven by few-shot prompting, batch-processing and context chaining for better accuracy and efficiency.
 
 - **LLM-Based Review Understanding:** Uses Gemini-2.0-Flash for natural language understanding.
 - **Few-shot Prompting:** Guides the LLM to extract meaningful entities and understand the underlying sentiment using domain specific examples.
 - **Entity-Level Sentiment Analysis:** Unlike traditional systems that assign a single sentiment per review, this system evaluates and assigns sentiment to each entity mentioned in the review, providing a more granular and accurate understanding of the user's opinion.
-- **Batch Processing Mechanism:** Reviews are processed in batches. By any chance, if the process stops adruptly (for eg: LLM daily quota is exhausted), a checkpoint including all details and results retrieved till then will be saved. The saved checkpoint can be used to resume the analysis from next batch onwards.
+- **Batch Processing Mechanism:** Reviews are processed in batches. By any chance, if the process stops abruptly (for eg: LLM daily quota is exhausted), a checkpoint including all details and results retrieved till then will be saved. The saved checkpoint can be used to resume the analysis from next batch onwards.
 - **Context Memory:** All the unique entities extracted are stored and used by the LLM as reference before generating new entities for the subsequent batch. It helps in generalizing over similar entities and avoid duplications.
 
 # Setup
@@ -60,20 +57,23 @@ Step 3: Configure API Key for LLM:
 
 # Dataset
 
-We use three datasets for review analysis:
+We use the following for review analysis:
 
-1. **ABSA (Aspect-Based Sentiment Analysis) Dataset from SemEval-2014:**  
+- **ABSA (Aspect-Based Sentiment Analysis) Dataset from SemEval-2014:**  
    Contains fine-grained sentiment annotations for multiple aspects per review, covering Laptops and Restaurants.  
    It’s particularly useful for evaluating the system’s accuracy in aspect-level sentiment detection.
 
-2. **Amazon Reviews Dataset:**  
+ <details>
+
+  <summary><b>Additional Datasets (click to expand)</b></summary>
+
+- **Amazon Reviews Dataset:**  
    Provides large-scale, real-world customer reviews across various product categories.  
    It allows us to analyze sentiment and extract key aspects from diverse and noisy review data, making it ideal for general-purpose entity-level sentiment analysis.
 
-3. **Spotify Review Data:**  
+- **Spotify Review Data:**  
    Contains user reviews for the Spotify app collected from the Google Play Store.
-
-
+</details>
 
 ---
 
@@ -129,27 +129,27 @@ In the original dataset, each review is split across multiple rows, with each ro
 ```
 
 <details>
-<summary><b>Spotify Review Data</b></summary>
+<summary><b>Additional Datasets (click to expand)</b></summary>
 
- #### step 1. Download the Data
+ ## Spotify Review Data
+
+ ### step 1. Download the Data
 
 - Download the data from provide link:  
   👉 [spotify-app-reviews-2022](https://www.kaggle.com/datasets/mfaaris/spotify-app-reviews-2022)
 
- #### step 2. Organize the Files
+ ### step 2. Organize the Files
 -  Place it in the following directory:
 ```
 data/
 └── spotify_reviews.csv
 ```
-</details>
 
-<details>
-<summary><b>Amazon-Reviews Data</b></summary>
+## Amazon-Reviews Data 
 
 Follow the steps below to prepare Amazon review data for use in this project.
 
-#### step 1. Download the Data
+### step 1. Download the Data
 
 - Visit the dataset page:  
   👉 [Amazon Reviews 2023 – McAuley Lab | grouped-by-category](https://amazon-reviews-2023.github.io/#grouped-by-category)
@@ -160,7 +160,7 @@ Follow the steps below to prepare Amazon review data for use in this project.
 
 ---
 
-#### step 2. Organize the Files
+### step 2. Organize the Files
 After downloading the desired category-wise dataset as per step 1, you will get two files(zip) for the selected category
 (For eg: Fashion):
 
@@ -176,7 +176,7 @@ data/
     └── meta_Fashion.jsonl
 ```    
 
-#### step 3. Run the Preparation Script
+### step 3. Run the Preparation Script
 
 Once organized, use the following command to process the data:
 
@@ -194,8 +194,10 @@ python -m data_preparation.prepare_amazon_data \
 --meta_filename meta_Amazon_Fashion.jsonl
 ```
 This will process the dataset by grouping reviews with the same parent_asin and save the top 20 product groups (based on number of reviews) as separate datasets.
+
 </details>
 
+---
 
 # Run the Analyzer
 
