@@ -270,7 +270,7 @@ with tab5:
     )
 
     st.markdown("""
-        ** 5️⃣ Continuos generation and mapping**  
+        **5️⃣ Continuos generation and mapping**  
         - **Entity Alignment with Memory** -- The LLM references existing entities stored in memory. If a review mentions a previously identified concept (e.g., "Battery Life"), the model assigns it to the same entity instead of creating a duplicate (e.g., avoiding "Battery Performance" as a separate entity).
 
         - **Handling New Topics** -- If a review introduces a completely new topic that isn't in memory, the model creates a new entity dynamically, ensuring that all key themes are captured.

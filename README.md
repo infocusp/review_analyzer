@@ -1,9 +1,36 @@
-# Review Analyzer - Extract Key themes/topics along with their sentiments
+# Review Analyzer: LLM-Powered Feedback Insights
 
-Analyzes user reviews using LLM to identify the key entities being discussed along with their sentiment (Positive or Negative) and generates meaningful insights. So basically it a combination of Named Entity Recognition and Sentiment Anlysis, performed at real time using the power of LLM.
+> Analyze user reviews using LLMs to extract entity-level sentiment, uncover key themes, and explore insights via a web interface.
+
+<p align="center">
+  <img src="img/report.png" width="45%" alt="Snapshot 1"/>
+  &nbsp; &nbsp;
+  <img src="img/manual_verification.png" width="45%" alt="Snapshot 1"/>
+</p>
+
+<p align="center">
+  <img src="img/frequency_insights.png" width="45%" alt="Snapshot 2"/>
+  &nbsp; &nbsp;
+  <img src="img/sentiment_insights.png" width="45.2%" alt="Snapshot 1"/>
+</p>
 
 
-Includes a web application which includes detailed explanation of how and why the solution works. Also, you can explore various interactive insights and analyze the user feedbacks efficiently and effectively.
+# 🔍 Overview
+
+This project uses **large language models (LLMs)** to analyze user reviews by extracting key **entities** (such as product features or services) and identifying the associated **sentiments** (positive or negative). It combines **named entity recognition (NER)** with **sentiment analysis** to generate structured, interpretable insights from raw textual feedback.
+
+The system includes two main components:
+
+- ## 🧠 Review Analyzer  
+  A backend module that processes batches of user reviews and generates a structured **JSON report**. Each entry captures the detected entities, their sentiment, and the associated review id.
+
+- ## 💻 Web Application  
+  An interactive frontend that loads and visualizes the JSON report. It provides:
+  - A static explanation of the methodology, such as a flowchart describing how the **LLM-based analysis** works
+  - Aggregate statistics and visual summaries across all reviews  
+  - Detailed insights into each review, including extracted entities and sentiment labels  
+
+This setup is ideal for teams that want to analyze user feedback at scale with **LLM-powered precision** and explore the results through a clean, insightful interface.
 
 # Key components
 The system is primarily driven by few-shot prompting, batch-processing and context chaining for better accuracy and efficiency.
@@ -11,7 +38,7 @@ The system is primarily driven by few-shot prompting, batch-processing and conte
 - **LLM-Based Review Understanding:** Uses Gemini-2.0-Flash for natural language understanding.
 - **Few-shot Prompting:** Guides the LLM to extract meaningful entities and understand the underlying sentiment using domain specific examples.
 - **Entity-Level Sentiment Analysis:** Unlike traditional systems that assign a single sentiment per review, this system evaluates and assigns sentiment to each entity mentioned in the review, providing a more granular and accurate understanding of the user's opinion.
-- **Batch Processing Mechanism:** Reviews are processed in batches. By any chance, if the process stops adruptly (for eg: LLM daily quota is exhausted), a checkpoint including all details and results retrieved till then will be saved. The saved checkpoint can be used to resume the analysis from next batch onwards.
+- **Batch Processing Mechanism:** Reviews are processed in batches. By any chance, if the process stops abruptly (for eg: LLM daily quota is exhausted), a checkpoint including all details and results retrieved till then will be saved. The saved checkpoint can be used to resume the analysis from next batch onwards.
 - **Context Memory:** All the unique entities extracted are stored and used by the LLM as reference before generating new entities for the subsequent batch. It helps in generalizing over similar entities and avoid duplications.
 
 # Setup
@@ -28,20 +55,25 @@ Step 3: Configure API Key for LLM:
 - create a `.env` file in the project root directory
 - write to file: GOOGLE_API_KEY = "your api key"
 
-# Datasets Used
+# Dataset
 
-We use three datasets for review analysis:
+We use the following for review analysis:
 
-1. **Spotify Review Data:**  
-   Contains user reviews for the Spotify app collected from the Google Play Store.
+- **ABSA (Aspect-Based Sentiment Analysis) Dataset from SemEval-2014:**  
+   Contains fine-grained sentiment annotations for multiple aspects per review, covering Laptops and Restaurants.  
+   It’s particularly useful for evaluating the system’s accuracy in aspect-level sentiment detection.
 
-2. **Amazon Reviews Dataset:**  
+ <details>
+
+  <summary><b>Additional Datasets (click to expand)</b></summary>
+
+- **Amazon Reviews Dataset:**  
    Provides large-scale, real-world customer reviews across various product categories.  
    It allows us to analyze sentiment and extract key aspects from diverse and noisy review data, making it ideal for general-purpose entity-level sentiment analysis.
 
-3. **ABSA (Aspect-Based Sentiment Analysis) Dataset from SemEval-2014:**  
-   Contains fine-grained sentiment annotations for multiple aspects per review, covering Laptops and Restaurants.  
-   It’s particularly useful for evaluating the system’s accuracy in aspect-level sentiment detection.
+- **Spotify Review Data:**  
+   Contains user reviews for the Spotify app collected from the Google Play Store.
+</details>
 
 ---
 
@@ -52,20 +84,69 @@ Each dataset should be a CSV file with a column named `"Review"`.
 Optionally, a column named `"Time_submitted"` can be included to store review timestamps (date or date-time).
 
 ---
-## Spotify Review Data
+
+## SemEval Data
+Follow the steps below to prepare SemEval-2014 data for use in this project.
 
 ### step 1. Download the Data
+
+- Download the data from provide link:  
+  👉 [SemEval 2014 Task 4: AspectBasedSentimentAnalysis](https://www.kaggle.com/datasets/charitarth/semeval-2014-task-4-aspectbasedsentimentanalysis)
+
+### step 2. Organize the Files
+
+Extract the zip downloaded in step 1 and place the files in the following directory structure:
+```
+data/
+└── semeval/
+  ├── Laptop_Train_v2.csv
+  └── Restaurants_Train_v2.csv
+  └── ....
+```   
+
+### step 3. Run the Preparation Script
+
+Use the following command to process the data:
+
+```bash
+python -m data_preparation.prepare_semeval_data \
+--file_path <path to the csv dataset file> \
+--save_path <path to save prepared data>
+```
+**Example**
+```bash
+python -m data_preparation.prepare_semeval_data \
+--file_path data/semeval/Laptop_Train_v2.csv \
+--save_path data/semeval/prepared_laptop_train.csv
+```
+In the original dataset, each review is split across multiple rows, with each row representing a different aspect and its sentiment. During data preparation, these rows are merged into a single row per review to consolidate all aspect-sentiment pairs together. The prepared csv will include a new column `Aspects`, which contains a list of dictionaries like:
+
+```json
+[
+  {"aspect": "battery life", "polarity": "positive"},
+  {"aspect": "price", "polarity": "negative"}
+]
+```
+
+<details>
+<summary><b>Additional Datasets (click to expand)</b></summary>
+
+ ## Spotify Review Data
+
+ ### step 1. Download the Data
+
 - Download the data from provide link:  
   👉 [spotify-app-reviews-2022](https://www.kaggle.com/datasets/mfaaris/spotify-app-reviews-2022)
 
-### step 2. Organize the Files
-2. Place it in the following directory:
+ ### step 2. Organize the Files
+-  Place it in the following directory:
 ```
 data/
 └── spotify_reviews.csv
 ```
 
-## Amazon-Reviews Data
+## Amazon-Reviews Data 
+
 Follow the steps below to prepare Amazon review data for use in this project.
 
 ### step 1. Download the Data
@@ -114,48 +195,10 @@ python -m data_preparation.prepare_amazon_data \
 ```
 This will process the dataset by grouping reviews with the same parent_asin and save the top 20 product groups (based on number of reviews) as separate datasets.
 
-## SemEval Data
-Follow the steps below to prepare SemEval-2014 data for use in this project.
+</details>
 
-### step 1. Download the Data
+---
 
-- Download the data from provide link:  
-  👉 [SemEval 2014 Task 4: AspectBasedSentimentAnalysis](https://www.kaggle.com/datasets/charitarth/semeval-2014-task-4-aspectbasedsentimentanalysis)
-
-### step 2. Organize the Files
-
-Extract the zip downloaded in step 1 and place the files in the following directory structure:
-```
-data/
-└── semeval/
-  ├── Laptop_Train_v2.csv
-  └── Restaurants_Train_v2.csv
-  └── ....
-```   
-
-### step 3. Run the Preparation Script
-
-Use the following command to process the data:
-
-```bash
-python -m data_preparation.prepare_semeval_data \
---file_path <path to the csv dataset file> \
---save_path <path to save prepared data>
-```
-**Example**
-```bash
-python -m data_preparation.prepare_semeval_data \
---file_path data/semeval/Restaurants_Train_v2.csv \
---save_path data/semeval/prepared_restaurants_train.csv
-```
-In the original dataset, each review is split across multiple rows, with each row representing a different aspect and its sentiment. During data preparation, these rows are merged into a single row per review to consolidate all aspect-sentiment pairs together. The prepared csv will include a new column `Aspects`, which contains a list of dictionaries like:
-
-```json
-[
-  {"aspect": "battery life", "polarity": "positive"},
-  {"aspect": "price", "polarity": "negative"}
-]
-```
 # Run the Analyzer
 
 ### Step 1: Configure Dataset & Experiment Name
@@ -202,7 +245,9 @@ Run the following command from project root:
 PYTHONPATH=. streamlit run app/home.py
 ```
 # Customization
-The current system is optimized for **Spotify user reviews**. If you want to analyse reviews for some other product or service, you need to:
+The current system is **dataset-agnostic** and can be applied to review data from any domain (apps, products, services, locations, etc.).
+
+To tailor the system to a specific use case:
 
 - Modify the few-shot examples in `src/few_shot_examples` and the system prompt in `prompts.py`.
 - Make sure the data format alligns with the current one, for eg: column names in csv file.
@@ -222,3 +267,19 @@ python -m utils.debug_batch_output --log_path results/<dataset_name>/<experiment
 ```bash
 python -m utils.debug_batch_output --log_path results/laptop/exp1/logs/batch_11.json
 ```
+
+# Results & Observations
+The system has been **qualitatively evaluated** across a range of datasets spanning different domains—products, services, and user experiences. The observed results have been highly encouraging as the entity extraction and sentiment tagging outputs have been consistently accurate and context-aware across domains.
+
+# Citation
+
+If you use this project in your work, please cite it as:
+
+```bibtex
+@misc{infocusp2025reviewanalyzer,
+  author       = {Falak Shah and Tushar Gadhiya and Milind Padalkar and Yash Bohra},
+  title        = {Review Analyzer: LLM-Powered Feedback Insights},
+  year         = {2025},
+  howpublished = {\url{https://github.com/infocusp/review_analyzer}},
+  note         = {Open-source project}
+}

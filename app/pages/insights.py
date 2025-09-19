@@ -88,24 +88,6 @@ with tab2:
              caption=plots[selected_plot]["description"],
              use_container_width=True)
 
-    st.markdown("""
-        # Key Observations
-
-        - **Spotify App** is the most frequently mentioned entity, with **15,612** mentions, significantly higher than other entities.
-        - **Music Selection (4,903 mentions)** and **Ads (4,566 mentions)** are the next most discussed topics, indicating strong user interest in content availability and ad experiences.
-        - **Playlist (3,548 mentions)** also has high mentions, suggesting that playlist management is a crucial aspect for users.
-        - **Podcast (1,563 mentions)** and **Subscription Cost (1,557 mentions)** are frequently discussed, likely reflecting user opinions on content variety and pricing concerns.
-        - **Player Controls (1,246 mentions)** and **Shuffle Feature (1,185 mentions)** are also major topics, highlighting user interest in playback functionality.
-        - **UI (1,147 mentions)** and **Audio Quality (1,104 mentions)** indicate that user experience and sound quality are important factors.
-        - **Lower-mentioned entities** such as **Storage (108 mentions), Videoke Feature (19 mentions), and Dark Mode (16 mentions)** suggest these features are either niche or not widely discussed.
-
-        ---
-
-        ## Overall Insights:
-        - The most mentioned entities generally revolve around **core functionality (Spotify App, Playlists, Player Controls, UI, Audio Quality)** and **monetization factors (Ads, Subscription Cost).**
-        - Features with lower mentions might indicate **lesser user engagement** or **lack of awareness**.
-        """)
-
 # Tab 3 : Sentiment Distrubution
 with tab3:
     selected_plot = "Sentiment Intensity Heatmap"
