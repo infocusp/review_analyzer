@@ -2,8 +2,11 @@
 
 > Analyze user reviews using LLMs to extract entity-level sentiment, uncover key themes, and explore insights via a web interface.
 
-![Streamlit App Demo](assets/webapp_demo.gif)
-
+<!-- ![Streamlit App Demo](assets/webapp_demo_zoomed.gif) -->
+<video autoplay loop muted playsinline>
+  <source src="assets/loom.mp4" type="video/mp4">
+  Your browser does not support the video tag.
+</video>
 
 # 🔍 Overview
 
