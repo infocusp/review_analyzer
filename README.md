@@ -2,17 +2,7 @@
 
 > Analyze user reviews using LLMs to extract entity-level sentiment, uncover key themes, and explore insights via a web interface.
 
-<p align="center">
-  <img src="img/report.png" width="45%" alt="Snapshot 1"/>
-  &nbsp; &nbsp;
-  <img src="img/manual_verification.png" width="45%" alt="Snapshot 1"/>
-</p>
-
-<p align="center">
-  <img src="img/frequency_insights.png" width="45%" alt="Snapshot 2"/>
-  &nbsp; &nbsp;
-  <img src="img/sentiment_insights.png" width="45.2%" alt="Snapshot 1"/>
-</p>
+![Streamlit App Demo](assets/webapp_demo.gif)
 
 
 # 🔍 Overview
