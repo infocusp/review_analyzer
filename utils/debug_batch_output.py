@@ -14,8 +14,7 @@ from utils import constants
 load_dotenv()
 
 #Initialize logger
-Mylogger = analyzer_utils.Logger("Review Analyzer")
-logger = Mylogger.get_logger()
+logger = analyzer_utils.Logger("Review Analyzer").get_logger()
 
 
 def debug_batch(file_path: str,

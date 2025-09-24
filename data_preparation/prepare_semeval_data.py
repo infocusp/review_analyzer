@@ -8,8 +8,7 @@ import pandas as pd
 
 from utils import analyzer_utils
 
-Mylogger = analyzer_utils.Logger("Review Analyzer")
-logger = Mylogger.get_logger()
+logger = analyzer_utils.Logger("Review Analyzer").get_logger()
 
 
 def prepare_data(data_df: pd.DataFrame) -> pd.DataFrame:
