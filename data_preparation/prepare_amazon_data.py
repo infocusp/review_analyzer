@@ -9,8 +9,7 @@ import pandas as pd
 
 from utils import analyzer_utils
 
-Mylogger = analyzer_utils.Logger("Review Analyzer")
-logger = Mylogger.get_logger()
+logger = analyzer_utils.Logger("Review Analyzer").get_logger()
 
 
 def jsonl_to_dataframe(file_path: str, chunk_size: int = 10000):

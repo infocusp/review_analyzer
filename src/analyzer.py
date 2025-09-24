@@ -17,8 +17,8 @@ from utils import constants
 from utils import data_models
 
 #Initialize logger
-Mylogger = analyzer_utils.Logger("Review Analyzer")
-logger = Mylogger.get_logger()
+logger = analyzer_utils.Logger("Review Analyzer").get_logger()
+
 # load env variables
 load_dotenv()
 
